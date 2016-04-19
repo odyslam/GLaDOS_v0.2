@@ -49,6 +49,7 @@ def setup():
 # Called by WebIOPi at server shutdown
 def destroy():
     webiopi.debug("Script with macros - Destroy")
+    GPIO.setFunction(SERVO, GPIO.PWM)
     CloseUDoor()
     OffHeater()
 
@@ -102,6 +103,7 @@ def DownDoor():
 
 
 def UpDoor(status):
+    GPIO.setFunction(SERVO, GPIO.PWM)
     webiopi.debug("OpenUdoor=")
     global Servo
     webiopi.debug(Servo)
@@ -112,7 +114,7 @@ def UpDoor(status):
             webiopi.debug(-angle)
             #webiopi.sleep(0.01)
             GPIO.pwmWriteAngle(SERVO,-angle)
-            Servo = 1
+        Servo = 1
         if status == "enter":
             Timer(30,CloseUDoor).start()
         elif status == "leave":
@@ -134,6 +136,7 @@ def CloseUDoor():
             webiopi.debug(angle)
             GPIO.pwmWriteAngle(SERVO,angle)
         Servo = 0
+        GPIO.setFunction(SERVO, GPIO.IN)
 
 
 @webiopi.macro
