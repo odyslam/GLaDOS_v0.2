@@ -1,0 +1,182 @@
+@font-face {
+    font-family: "universlight";
+    src: url("fonts/UniversLTStd-LightUltraCn.otf");  }
+
+body {
+   font-family: "universlight", sans-serif;
+    font-size: 42px;
+    background-color: rgb(19, 102, 139);
+    font-style: italic;
+    font-weight: lighter;
+
+
+}
+table {
+    padding: 10px auto;
+    width: 900px;
+    height: 100px;
+    margin: 1.5% auto 1.5% auto;
+    background-color: #4893BD;
+    opacity:0.8;
+    border-radius: 100px / 50px;
+    /*border: 1px solid red;*/
+
+
+
+}
+
+th, td {
+    font-style: italic;
+    width:25%;
+    text-align : center;
+    opacity:1;
+    /*box-shadow: 2px 2px 5px  #27688E
+    border: 1px solid red; */
+    border-radius: 130px / 10px;
+
+
+}
+.more_functions {
+    margin-top:0px;
+    margin-bottom:0px;
+    /* border: 10px solid red; */
+}
+
+
+#boiler_table {
+    margin: 1.5% auto 1.5% auto;
+    width: 900px;
+    height: 100px;
+    padding:auto auto;
+   /* border: 11px solid red; */
+
+}
+.boiler {
+   /* border: 11px solid red; */
+}
+#clockid {
+    margin-left:45%;
+    width:300px;
+}
+
+#boiler_title {
+    position:relative;
+    margin: 20px auto 20px auto;
+    width:200px;
+
+
+}
+#title {
+    position:relative;
+    width:400px;
+    margin: 0px auto;
+    padding:0px auto 0px auto;
+
+}
+#day{
+    position: relative;
+    padding:auto auto;
+    left:30%;
+    bottom:120px;
+}
+i + i {  /* add spaces between i */
+    margin-left:40px;
+}
+
+.MyImage {
+    position: absolute;
+    float:left;
+    display:inline-block;
+    margin-right:30px;
+    margin-top:-200px;
+    margin-bottom:100px;
+    width: 300px;
+    height: 300px;
+
+
+
+}
+select {
+    /* border: 1px solid red; */
+    margin-top: 0px;
+    height:30px;
+    font-size: 24px;
+
+}
+
+
+p {
+    margin-bottom: 0px;
+    padding:0px auto;
+
+}
+
+
+#tint {
+    position: relative;
+
+}
+
+.icon:active {
+    padding-bottom:0px;
+    transform: translateY(7px);
+    opacity:0.5;
+
+}
+
+.onoffswitch {
+    display:inline-block;
+	position: relative; width: 80px;
+    margin: auto auto;
+	-webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+	display: none;
+}
+.onoffswitch-label {
+	display: block; overflow: hidden; cursor: pointer;
+	height: 32px; padding: 0; line-height: 32px;
+	border: 2px solid #CCCCCC; border-radius: 32px;
+	background-color: #FFFFFF;
+	transition: background-color 0.3s ease-in;
+}
+.onoffswitch-label:before {
+	content: "";
+	display: block; width: 32px; margin: 0px;
+	background: #FFFFFF;
+	position: absolute; top: 0; bottom: 0;
+	right: 47px;
+	border: 2px solid #CCCCCC; border-radius: 32px;
+	transition: all 0.3s ease-in 0s;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label {
+	background-color: #49E845;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label, .onoffswitch-checkbox:checked + .onoffswitch-label:before {
+	border-color: #49E845;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label:before {
+	right: 0px;
+}
+
+#hash{
+    margin-top:10%;
+    position:relative;
+    margin-left:45%;
+    font-size: 70%
+}
+
+@media only screen and (max-device-width: 480px) {
+    .MyImage{
+        position:relative;
+    }
+    #title{
+        position:relative;
+       margin-left:40%;
+        top:100px;
+    }
+    #day{
+        left:15%;
+
+    }
+}

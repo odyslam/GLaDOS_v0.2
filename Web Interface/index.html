@@ -1,0 +1,135 @@
+
+<!-- Cpu Monitor  https://groups.google.com/d/msg/webiopi/a1_SWOyLuXo/0EcmIBhJAwAJ -->
+
+<!DOCTYPE html>
+<html>
+<head>
+		<!-- NA VALOGPIO BUTTON pin5 gia hard reset to RASPBERRY -->
+       	<meta charset="utf-8">
+
+       	<link rel="shortcut icon" href="img/aperture.ico" type="image/x-icon" />
+        <script src="https://use.fontawesome.com/42c622ab78.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/GLaDOS.css">
+        <link rel="stylesheet" href="css/flipclock.css">
+    <script text="text/javascript" src = "script/GLaDOS.js"></script>
+        <script text="text/javascript" src = "script/jquery.js"></script>
+        <script src="script/flipclock.min.js"></script>
+        <script type="text/javascript" src="script/webiopi.js"></script>
+
+        <title> Mainframe </title>
+        <!--<script type="text/javascript" src="/webiopi.js"></script>
+
+        <script type="text/javascript" src="GLaDOS_Interface/script/GLaDOS.js"></script>-->
+</head>
+<body ontouchstart = "">
+<p>
+<h2 id = "title">GLaDOS Mainframe</h2>
+</p>
+<div>
+    <img class="MyImage" src="img/Glados.png" />
+    </div>
+	<div class = "general_functions">
+        <table>
+            <tr>
+                <th>Enter</th>
+                <th>Leave</th>
+                <th>PC</th>
+            </tr>
+            <tr>
+                <td >
+                    <div  class = "icon">
+                         <i class="fa fa-key fa-spin fa-1x fa-fw" aria-hidden="true" onclick="house(1);"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class = "icon" >
+                        <i class="fa fa-key fa-spin fa-1x fa-fw " aria-hidden="true" onclick="house(0);"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class="onoffswitch" >
+                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked onclick="pc();">
+                    <label class="onoffswitch-label" for="myonoffswitch"></label>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+<div class = "more_functions">
+    <table>
+        <tr>
+            <th><i class="fa fa-hand-o-left fa-1x" aria-hidden="true"></i>LivingRoom <i class="fa fa-lightbulb-o " aria-hidden="true"> </i></th>
+            <th><i class="fa fa-lightbulb-o " aria-hidden="true"></i>LivingRoom <i class="fa fa-hand-o-right fa-1x" aria-hidden="true"></i></th>
+            <th>Office <i class="fa fa-lightbulb-o " aria-hidden="true"> </i></th>
+        </tr>
+        <tr>
+            <td >
+                    <div class="onoffswitch" >
+                        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch1" onclick="light(0,3);" checked>
+                        <label class="onoffswitch-label" for="myonoffswitch1"></label>
+                    </div>
+
+            </td>
+            <td >
+                        <div class="onoffswitch" >
+                            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch2" onclick="light(1,4);"  checked>
+                            <label class="onoffswitch-label" for="myonoffswitch2"></label>
+
+                </div>
+            </td>
+            <td>
+                    <div class="onoffswitch" >
+                        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch3" onclick="light(2,1);" checked>
+                        <label class="onoffswitch-label" for="myonoffswitch3"></label>
+                    </div>
+            </td>
+        </tr>
+     </table>
+</div>
+<h3 id = boiler_title>Boiler</h3>
+
+<div class = "boiler">
+    <table id = "boiler_table">
+        <tr>
+            <th>Bath <i class=" fa fa-tint fa-1x fa-fw" id = "tint" aria-hidden="true"></i></th>
+            <th>Custom Time <i class=" fa fa-tint fa-1x fa-fw" id = "tint" aria-hidden="true"></i></th>
+        </tr>
+        <tr>
+            <td >
+                <div >
+                    <div class="onoffswitch" >
+                        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch4" onclick="heater(25*60);" unchecked>
+                        <label class="onoffswitch-label" for="myonoffswitch4"></label>
+                    </div>
+                </div>
+            </td>
+            <td class = "time_list">
+                <select  name = "time">
+                    <option value = "5">5 min</option>
+                    <option value = "10">10 min</option>
+                    <option value = "15">15 min</option>
+                    <option value = "20">20 min</option>
+                    <option value = "30">30 min</option>
+                </select>
+
+                <div id="list_switch" class="onoffswitch" >
+                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch5" onclick="heater_ctime();" unchecked>
+                    <label class="onoffswitch-label" for="myonoffswitch5"></label>
+                </div>
+        </tr>
+    </table>
+    <div id = "clockid">
+    <div  class="clock" style="margin:2em;"  ></div>
+    <div class="message"></div></div>
+
+
+</div>
+<span id = "day">
+          <i class="fa fa-sun-o fa-3x icon " aria-hidden="true" onclick="time_day(1)">   </i>
+            <i class="fa fa-moon-o fa-3x icon " aria-hidden="true" onclick="time_day(0)"></i>
+        </span>
+<p  id = "hash">Bios Version: Alpha 0.5, hash:001000101010101 </p>
+</body>
+</html>
