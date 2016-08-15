@@ -62,7 +62,7 @@ def setup():
 
 
 def destroy():
-	do.up_door("close")
+	do.up_door(0)
 	he.turn_off()
 
 
@@ -72,18 +72,19 @@ def destroy():
 def house(enter):
 	enter = int(enter)
 	webiopi.debug("type of enter=%s" %type(enter))
-	do.up_door()
+	do.up_door(enter)
 	if enter == 1:
 		webiopi.debug("entering house") #i am entering the house
 		do.inside = True
-		do.down_door()
+		do.down_door(1)
 		if pc.status == 0:
 			ap.turn_on_pc
 		#
 		if (datetime.now().time().hour > 6):
 			ap.set_status("digital","left_light",enter)
 			ap.set_status("digital","right_light",enter)
-		ap.set_status(digital,"tv-hifi",enter)
+		
+		ap.set_status("digital","tv-hifi",enter)
 		inf.send(HIFI,"KEY_POWER")
 		inf.send(HIFI,"KEY_COMPUTER")
 	
@@ -97,11 +98,11 @@ def house(enter):
 		Timer(10,do.alert)
 @webiopi.macro
 def open_door(door):
-	if door == "up":
-		do.up_door()
-	elif door == "both":
-		do.down_door()
-		do.up_door()
+	if door == 1:
+		do.up_door(1)
+	elif door == 2:
+		do.down_door(1)
+		do.up_door(1)
 
 @webiopi.macro
 def gday():

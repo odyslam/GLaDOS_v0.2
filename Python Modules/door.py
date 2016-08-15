@@ -15,28 +15,28 @@ class Doors():
 	def up_door(self,function):
 		GPIO.digitalWrite(self.servo_power, GPIO.HIGH)
 		
-		if function == "open":
+		if function == 1:
 			for angle in range(-90,90):
 				webiopi.debug(-angle)
 				GPIO.pwmWriteAngle(self.servo,-angle)
 			self.update_status(0) #initialize self.counter ,pass it as an argument
-		elif function == "close":
+		elif function == 0:
 			for angle in range(-90,90):
 				GPIO.pwmWriteAngle(self.servo,angle)
 	    
 		GPIO.digitalWrite(self.servo_power, GPIO.LOW)
 	
 	def down_door(self,function): #function variable tells whether we want to open or close the door when we call the down_door
-		if function == "open":
+		if function == 1:
 			GPIO.digitalWrite(self.outdoor, GPIO.HIGH)
 			Timer(3,self.down_door,["close"])
-		elif function == "close":
+		elif function == 0:
 			GPIO.digitalWrite(self.outdoor, GPIO.LOW)
 
 	def check_status(self): #for up.door which uses the servo
-		if (GPIO.digitalRead(d_status) == GPIO.LOW):
+		if (GPIO.digitalRead(self.d_status) == GPIO.LOW):
 			return "open"
-		elif (GPIO.digitalRead(d_status) == GPIO.HIGH):
+		elif (GPIO.digitalRead(self.d_status) == GPIO.HIGH):
 			return "close"
 	
 	def update_status(self,counter): # I want self.counter to persist each time I call the function, I need to detect an close/open/close sequence.
@@ -44,16 +44,16 @@ class Doors():
 			if(counter == 0):
 				counter +=1
 
-			elif(self.counter == 2):
-				self.up_door("close")
+			elif(counter == 2):
+				self.up_door(0)
 				return None
 
-			Timer(1,self.update_status(counter))
+			Timer(1,self.update_status,[counter])
 		
 		elif (self.check_status() == "open"):
-			if(self.counter == 1):
+			if(counter == 1):
 				counter +=1
-			Timer(1,self.update_status(counter))
+			Timer(1,self.update_status,[counter])
 	
 	def alert(self): #checks whethere status_open = true and plays the alert sound, it calls it self each time
 		if not self.inside:
