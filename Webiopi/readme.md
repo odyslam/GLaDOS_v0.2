@@ -1,3 +1,17 @@
+DISCLAIMER:
+
+This is the framework that my project is build upon.
+
+Webiopi was created by Eric Trouch  and froze in version 0.71 as it’s
+now used for a complete IoT solution called Cayenne by myDevices.
+
+This version is 0.72 used by Cayenne and enables support for Rpi2/3 as
+well for Jessie OS.
+
+
+
+Webiopi Official Readme
+
 ===WebIOPi is a fully integrated Internet of Things framework for the Raspberry Pi.===
    Control, debug, and use your Pi's GPIO locally or remotely, from a browser or any app.
    WebIOPi is the perfect Swiss-knife to make connected things with the Raspberry Pi.
