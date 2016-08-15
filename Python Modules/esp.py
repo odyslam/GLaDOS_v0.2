@@ -13,7 +13,7 @@ class Api():
 		try:
 			resp = requests.get(self.address)
 			if resp.status_code != 200:
-				print("can't get status from api")
+				webiopi.debug("can't get status from api")
 		except:
 			webiopi.debug("connection error at init")
 			
@@ -24,7 +24,7 @@ class Api():
 		try:
 			resp = requests.get(self.address + "/" + function + "/" + pin)
 			if resp.status_code !=200:
-				print("can't get status from api: "+ self.address+function+pin)
+				webiopi.debug("can't get status from api")
 			answer = resp.json()
 			return int(answer["return_value"])
 		except:

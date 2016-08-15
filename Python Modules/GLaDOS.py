@@ -160,8 +160,7 @@ def status():
 	a = ap.get_status("digital","left_light")
 	b = ap.get_status("digital","right_light")
 	el_time = he.elapsed_time()
-	webiopi.debug("elapsed time:")
-	webiopi.debug(el_time)
+	webiopi.debug("elapsed time:%s" % el_time)
 	he_stat = he.heater_status
 	c = pc.status()
 	
