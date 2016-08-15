@@ -3,7 +3,6 @@ import time
 from threading import Timer
 import sys
 sys.path.insert(0, '/home/pi/glados_interface/python')
-import rc_switch
 import door
 import esp
 import infrared
@@ -17,60 +16,65 @@ import json
 #Pin Variables#
 GPIO = webiopi.GPIO
 
+#CONSTANTS
+
+PC_ADDRESS = "http://192.168.1.20"
+ESP8266_ADDRESS = "http://192.168.1.21"
+HEATER_SOCKET = 3 
+
+#PINS
+
 SERVO_PIN = 27
 SERVO_STATUS_PIN = 24
 OUTDOOR_PIN = 25
 TRANSMITTER_PIN = 1 # GPIO.1 = pin 18
-PC_ADDRESS = "192.168.1.20"
-ESP8266_ADDRESS = "192.168.1.21"
 DOOR_STATUS_PIN = 4
-INFRARED_PIN = 23 #just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
-HEATER_SOCKET = 3 
+INFRARED_PIN = 22 #just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
 
 
+#GLobal Instances
+
+
+do = door.Doors(SERVO_PIN,OUTDOOR_PIN,DOOR_STATUS_PIN,SERVO_STATUS_PIN)
+ap = esp.Api(ESP8266_ADDRESS)
+inf = infrared.Infrared(INFRARED_PIN)
+pc = pc_control.Pc(PC_ADDRESS)
+he = heater.Heater(HEATER_SOCKET,TRANSMITTER_PIN)
+
+#global variables for sockets
+
+socket1_status = 0
+socket2_status = 0
 
 def setup():
-		gla = GLaDOS(1)
-		sysr = subprocess.Popen("nohup", "sudo python","/home/pi/glados_core/interface/python/system_restart.py") # call subprocess
+	webiopi.debug("Setup")
+	GPIO.setFunction(SERVO_STATUS_PIN, GPIO.IN)
+	GPIO.setFunction(OUTDOOR_PIN, GPIO.OUT)
+	GPIO.setFunction(SERVO_STATUS_PIN, GPIO.OUT)
+	GPIO.setFunction(SERVO_PIN, GPIO.PWM)
+	GPIO.setFunction(DOOR_STATUS_PIN, GPIO.IN)	
+
+	GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
+	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
+	
+	do.up_door("close")
+	#sysr = subprocess.Popen("sudo python","/home/pi/glados_core/interface/python/system_restart.py") # call subprocess
 
 
 def destroy():
-		gla.terminate()
-
-
-class GLaDOS():
-	def __init__(self,dbug):
-		if dbug == 1:
-			webiopi.setDebug()
-
-		do = door.Doors(SERVO_PIN,OUTDOOR_PIN,DOOR_STATUS_PIN,SERVO_STATUS_PIN)
-		ap = esp.Api(ESP8266_ADDRESS)
-		inf = infrared.Infrared(INFRARED_PIN)
-		pc = pc_control.Pc(PC_ADDRESS)
-		rc1 = rc_switch.Rsiwtch(1,TRANSMITTER_PIN) #1=socketnumber
-		rc2 = rc_switch.Rsiwtch(2,TRANSMITTER_PIN)
-		he = heater.Heater(HEATER_SOCKET,TRANSMITTER_PIN)
-
-
-
-		GPIO.setFunction(SERVO_STATUS_PIN, GPIO.IN)
-		GPIO.setFunction(OUTDOOR_PIN, GPIO.OUT)
-		GPIO.setFunction(SERVO_PIN, GPIO.PWM)
-		GPIO.setFunction(DOOR_STATUS_PIN, GPIO.IN)	
-		GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
-		do.up_door("close")
-	
-	def terminate(self):
-		do.up_door()
-		he.turn_off()
+	do.up_door("close")
+	he.turn_off()
 
 
  #~~~~~~~~~~~~~~~~MACROS MACROS MACROS MACROS MACROS MACROS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-@macro
+@webiopi.macro
 def house(enter):
+	enter = int(enter)
+	webiopi.debug("type of enter=%s" %type(enter))
 	do.up_door()
-	if enter == 1: #i am entering the house
+	if enter == 1:
+		webiopi.debug("entering house") #i am entering the house
 		do.inside = True
 		do.down_door()
 		if pc.status == 0:
@@ -85,14 +89,21 @@ def house(enter):
 	
 	else: #enter = 0 <=> I am exiting the house
 		do.inside = False 
-		#
+		webiopi.debug("leaving house")
 		ap.set_status("digital","left_light",enter)
 		ap.set_status("digital","right_light",enter)
-		ap.set_status(digital,"tv-hifi",enter)
+		ap.set_status("digital","tv-hifi",enter)
 		#
 		Timer(10,do.alert)
+@webiopi.macro
+def open_door(door):
+	if door == "up":
+		do.up_door()
+	elif door == "both":
+		do.down_door()
+		do.up_door()
 
-@macro
+@webiopi.macro
 def gday():
 	if pc.status == 0:
 		ap.turn_on_pc
@@ -103,46 +114,68 @@ def gday():
 	inf.send(HIFI,"KEY_COMPUTER")
 	Timer(5,pc.log_in)
 	Timer(10,pc.music,["morning","chill"])
-@macro
+@webiopi.macro
 def gnight():
 	ap.set_status("digital","left_light",0)
 	ap.set_status("digital","right_light",0)
-	ap.set_status(digital,"tv-hifi",0)
+	ap.set_status("digital","tv-hifi",0)
 
-@macro
+@webiopi.macro
 def heater(mode,time):
+	mode = int(mode)
+	time = int(time)
 	if mode == 1:
+		webiopi.debug("heater started for : ")
+		webiopi.debug(time)
+
 		he.turn_on(time) #time in seconds
 	elif mode == 0:
+		webiopi.debug("heater stop")
 		he.turn_off()
 
 
-@macro
+@webiopi.macro
 def lights(number,function): #function = 1 or 0, on/off
+	number = int(number)
+	function = int(function)
 	if number == 1:
-		rc1.send(function)
+		ret = subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),str(function),str(1))],shell=True)
+		if ret !=0:
+			webiopi.debug("can't call rc_send")
+		socket1_status = function
 	elif number == 2:
-		rc2.send(function)
+		ret = subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),str(function),str(2))],shell=True)
+		if ret !=0:
+			webiopi.debug("can't call rc_send")
+		socket2_status = function
+		#rc2.send(function)
 	elif number == 3:
 		ap.set_status("digital","left_light",function)
 	elif number == 4:
 		ap.set_status("digital","right_light",function)
 
+@webiopi.macro
 def status():
 	a = ap.get_status("digital","left_light")
 	b = ap.get_status("digital","right_light")
-	el.time = he.elapsed_time()
+	el_time = he.elapsed_time()
+	webiopi.debug("elapsed time:")
+	webiopi.debug(el_time)
+	he_stat = he.heater_status
+	c = pc.status()
 	
-	return json.dumps([rc1.status,rc2.status,a,b,do.inside,he.heater_status,el.time])
-
-@macro 
+	#socket1 socket2 left_light right_light pc inside heater elapsed_time
+	
+	return json.dumps([socket1_status,socket2_status,a,b,c,do.inside,he_stat,el_time], separators=(',',':'))
+@webiopi.macro
 def desktop_pc(function):
+	function = int(function)
 	if function == 0: 
 		pc.turn_off()
 	if function == 1:
 		ap.turn_on_pc
 
-	if function == "status":
+	if function == "status": #status = 1/0
 		status = pc.status()
 		return  json.dumps ([status])
 

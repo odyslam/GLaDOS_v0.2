@@ -11,10 +11,14 @@
         <script src="https://use.fontawesome.com/42c622ab78.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/GLaDOS.css">
         <link rel="stylesheet" href="css/flipclock.css">
-    <script text="text/javascript" src = "script/GLaDOS.js"></script>
-        <script text="text/javascript" src = "script/jquery.js"></script>
+        
+        <script type="text/javascript" src="/webiopi.js"></script>
+        <script src="script/jquery.js"></script>
         <script src="script/flipclock.min.js"></script>
-        <script type="text/javascript" src="script/webiopi.js"></script>
+        <script text="text/javascript" src = "script/GLaDOS.js"></script>
+        
+        
+        
 
         <title> Mainframe </title>
         <!--<script type="text/javascript" src="/webiopi.js"></script>
@@ -27,7 +31,12 @@
 </p>
 <div>
     <img class="MyImage" src="img/Glados.png" />
-    </div>
+</div>
+
+<div id = "door_container">
+    <img class = "door_icons" src= "img/house.svg" onclick = "doors("both");" />
+    <img class = "door_icons" src = "img/door.svg" onclick = "doors("up");"/>
+</div>
 	<div class = "general_functions">
         <table>
             <tr>
@@ -60,8 +69,8 @@
 <div class = "more_functions">
     <table>
         <tr>
-            <th><i class="fa fa-hand-o-left fa-1x" aria-hidden="true"></i>LivingRoom <i class="fa fa-lightbulb-o " aria-hidden="true"> </i></th>
-            <th><i class="fa fa-lightbulb-o " aria-hidden="true"></i>LivingRoom <i class="fa fa-hand-o-right fa-1x" aria-hidden="true"></i></th>
+            <th><i class="fa fa-hand-o-left fa-1x" aria-hidden="true"></i>LivingRoom<i class="fa fa-lightbulb-o " aria-hidden="true"> </i></th>
+            <th><i class="fa fa-lightbulb-o " aria-hidden="true"></i>LivingRoom<i class="fa fa-hand-o-right fa-1x" aria-hidden="true"></i></th>
             <th>Office <i class="fa fa-lightbulb-o " aria-hidden="true"> </i></th>
         </tr>
         <tr>
@@ -100,13 +109,13 @@
             <td >
                 <div >
                     <div class="onoffswitch" >
-                        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch4" onclick="heater(25*60);" unchecked>
+                        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch4" onclick="heater(25);" unchecked>
                         <label class="onoffswitch-label" for="myonoffswitch4"></label>
                     </div>
                 </div>
             </td>
             <td class = "time_list">
-                <select  name = "time">
+                <select  id = "time">
                     <option value = "5">5 min</option>
                     <option value = "10">10 min</option>
                     <option value = "15">15 min</option>

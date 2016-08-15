@@ -73,10 +73,33 @@ th, td {
     padding:0px auto 0px auto;
 
 }
+#door_container{
+    position:absolute;
+    right: 1%;
+    top:5%;
+    padding:10px 10px;
+}
+.door_icons{
+    height: 80px;
+    margin-right:15px;
+    width: 80px;
+
+    -moz-transition: all 2s linear;
+    -webkit-transition: all 2s linear;
+    transition: all 0.5s linear;
+
+}
+
+.door_icons.down{
+    -moz-transform:rotate(360deg);
+    -webkit-transform:rotate(360deg);
+    transform:rotate(360deg);
+}
+
 #day{
     position: relative;
     padding:auto auto;
-    left:30%;
+    left:24%;
     bottom:120px;
 }
 i + i {  /* add spaces between i */

@@ -2,13 +2,15 @@ import webiopi
 from threading import Timer
 import pygame
 
+GPIO = webiopi.GPIO
+
 class Doors():
 	def __init__(self,servo_pin,outdoor_pin,door_status_pin,servo_power): #we want the servo to be powered-off when it's in standby so as not to jiggle. We control thr power line with a mosfet or optocoupler.
 		self.servo = servo_pin
 		self.outdoor= outdoor_pin
 		self.d_status = door_status_pin
 		self.servo_power = servo_power
-		self.inside == True #whether I am in or out
+		self.inside = 1 #whether I am in or out
 	 
 	def up_door(self,function):
 		GPIO.digitalWrite(self.servo_power, GPIO.HIGH)

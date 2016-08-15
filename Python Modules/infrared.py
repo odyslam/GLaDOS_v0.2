@@ -1,10 +1,10 @@
-import os
+from subprocess import call
 
 class Infrared():
 	def __init__(self,led_pin):
 		self.pin = led_pin
 	def send(self,application,command):
-		os.system("irsend SEND_ONCE " + application + " " + command)
+		call(["irsend SEND_ONCE",str(application),str(command)])
 
 	#need  to create lirc config file
 	#exambple : os.system("irsend SEND_ONCE samsungTV KEY_VOLUMEUP")

@@ -1,5 +1,6 @@
 import pi_switch
 
+
 class Rcswitch():
     def __init__(self,socket_number,tran_pin): #tran_pin=0, na to oristo otan to ftiakso
         self.socket_on = ("000000010100010001010101","000000010101000001010101","000000010001010001010101")
