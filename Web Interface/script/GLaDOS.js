@@ -25,7 +25,7 @@ function store_status(macro,args,data) {
      console.log("el_time"+ el_time)
      countdown_clock(el_time)
  }
-function set_status(peos){
+function set_status(){
 
     document.getElementById("myonoffswitch").checked = pc_status;
     document.getElementById("myonoffswitch1").checked = l_light_status;
