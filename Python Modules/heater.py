@@ -36,8 +36,7 @@ class Heater():
 			return 0
 		else:
 			elapsed = time.time() - self.heater_start #elapsed =16 sec
-			sec_end = int(self.runtime -elapsed) #till end is runtime(e.g 9000sec) - elapsed(e.16sec)
-
+			sec_end = int(self.runtime - elapsed) #till end is runtime(e.g 9000sec) - elapsed(e.16sec)
 			return sec_end
 
 
