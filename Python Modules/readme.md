@@ -11,7 +11,7 @@ It's the script that controls the building's door(down_door) and appartment's do
 ##esp.py : 
 It communicates with various esp8266 via REST calls, esp8266 is a IoT SOC that can be programmed through the Arduino environment.
 
-#heater.py: 
+##heater.py: 
 Module that controls the boiler and it's timer. The boiler is controled via a RF switch.
 
 ##infrared.py : 
@@ -23,5 +23,5 @@ This script will call python2 scripts that use vncdotool to control remotely my 
 ##rc_send.py: 
 python2 scripts that used pi_switch library to send rf signals, it's called via shell commands from other scripts.
 
-###system_restart: 
+##system_restart: 
 Thanks to selenium and httplib it will check whether rpi2 has internet or the server is online and will either reboot the router or reboot the rpi.
