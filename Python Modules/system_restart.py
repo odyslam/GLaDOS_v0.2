@@ -1,6 +1,7 @@
 import httplib
 import os
 from threading import Timer
+import Selenium
 
 class SystemRestart():
 
@@ -35,6 +36,8 @@ class SystemRestart():
 			os.system("sudo reboot")
 		else:
 			return True
+	def router_reboot(self):
+		pass
 
 
 if __name__ == '__main__':

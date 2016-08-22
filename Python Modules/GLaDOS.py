@@ -19,7 +19,7 @@ GPIO = webiopi.GPIO
 #CONSTANTS
 
 PC_ADDRESS = "http://192.168.1.20"
-ESP8266_ADDRESS = "http://192.168.1.21"
+ESP8266_ADDRESS = "http://192.168.1.30"
 HEATER_SOCKET = 3 
 
 #PINS
@@ -57,7 +57,7 @@ def setup():
 	GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
 	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
 	
-	do.up_door("close")
+	do.up_door(0)
 	#sysr = subprocess.Popen("sudo python","/home/pi/glados_core/interface/python/system_restart.py") # call subprocess
 
 
@@ -75,7 +75,7 @@ def house(enter):
 	do.up_door(enter)
 	if enter == 1:
 		webiopi.debug("entering house") #i am entering the house
-		do.inside = True
+		do.inside = 1
 		do.down_door(1)
 		if pc.status == 0:
 			ap.turn_on_pc
@@ -85,11 +85,11 @@ def house(enter):
 			ap.set_status("digital","right_light",enter)
 		
 		ap.set_status("digital","tv-hifi",enter)
-		inf.send(HIFI,"KEY_POWER")
-		inf.send(HIFI,"KEY_COMPUTER")
+		#inf.send("HIFI","KEY_POWER")
+		#inf.send(HIFI,"KEY_COMPUTER")
 	
 	else: #enter = 0 <=> I am exiting the house
-		do.inside = False 
+		do.inside = 0
 		webiopi.debug("leaving house")
 		ap.set_status("digital","left_light",enter)
 		ap.set_status("digital","right_light",enter)

@@ -52,10 +52,10 @@ function time_day(gday){
 
 function pc() {
      if (pc_status == 1) {
-         webiopi().callMacro("desktop_pc", "off");
+         webiopi().callMacro("desktop_pc", [0]);
      }
      else {
-         webiopi().callMacro("desktop_pc", "on");
+         webiopi().callMacro("desktop_pc", [1]);
      }
  }
 function light(l_group_status,number){

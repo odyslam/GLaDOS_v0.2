@@ -1,7 +1,5 @@
 import sys
 import webiopi
-sys.path.insert(0, '/home/pi/glados_interface/python')
-import json
 import time
 from subprocess import call
 from threading import Timer
