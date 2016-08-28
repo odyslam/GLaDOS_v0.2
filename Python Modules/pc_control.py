@@ -14,6 +14,6 @@ class Pc():
 		else:
 			return 1
 
-	def vnc_control(self,function): #function = log_in/shutdown/music + args
-		subprocess.call("path/to/script %s %s %s")
+	def vnc_control(self,function,time,mood): #function = log_in/shutdown/music + args
+		subprocess.call("path/to/script %s %s %s" %(function,time,mood))
 

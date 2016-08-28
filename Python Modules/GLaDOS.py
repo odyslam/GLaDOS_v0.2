@@ -25,11 +25,11 @@ HEATER_SOCKET = 3
 #PINS
 
 SERVO_PIN = 27
-SERVO_STATUS_PIN = 24
+SERVO_STATUS_PIN = 17
 OUTDOOR_PIN = 25
 TRANSMITTER_PIN = 1 # GPIO.1 = pin 18
-DOOR_STATUS_PIN = 4
-INFRARED_PIN = 22 #just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
+DOOR_STATUS_PIN = 24
+INFRARED_PIN =  #just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
 
 
 #GLobal Instances

@@ -1,7 +1,7 @@
 import httplib
 import os
 from threading import Timer
-import Selenium
+import subprocess
 
 class SystemRestart():
 
@@ -37,7 +37,8 @@ class SystemRestart():
 		else:
 			return True
 	def router_reboot(self):
-		pass
+		subprocess.call("python /home/pi/glados_interface/python/router_restart.py",shell = True)
+		
 
 
 if __name__ == '__main__':
