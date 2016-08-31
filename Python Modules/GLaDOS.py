@@ -59,8 +59,7 @@ def setup():
 	
 	do.up_door(0)
 	#sysr = subprocess.Popen("sudo python","/home/pi/glados_core/interface/python/system_restart.py") # call subprocess
-
-
+	#daemon.process(system_restart.py) #TODO
 def destroy():
 	do.up_door(0)
 	he.turn_off()
@@ -111,8 +110,9 @@ def gday():
 	ap.set_status("digital","left_light",1)
 	ap.set_status("digital","right_light",1)
 	ap.set_status(digital,"tv-hifi",1)
-	inf.send(HIFI,"KEY_POWER")
-	inf.send(HIFI,"KEY_COMPUTER")
+	inf.send("HIFI","power",1)
+	inf.send("HIFI","input_computer",1)
+	inf.send("HIFI","volume_up",15)
 	Timer(5,pc.log_in)
 	Timer(10,pc.music,["morning","chill"])
 @webiopi.macro

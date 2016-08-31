@@ -4,7 +4,7 @@ import random
 
 
 
-def music(time,mood):
+def music(time,mood): #uses spotify window
 	music = []
 	if time == "morning":
 		music.append("morning acoustic")
@@ -24,7 +24,7 @@ def music(time,mood):
 	client.mouseMove(320,1050)
 	client.pause(0.5)
 	client.keyPress('super-up')
-	client.pause(0.4)
+	client.pause(1)
 	client.keyPress('lctrl-l')
 	client.pause(0.5)
 	for i in playlist:
@@ -48,6 +48,7 @@ def log_in(dummy1,dummy2):
 
 def shutdown(dummy1,dummy2):
 	client.keyPress('ctrl-alt-del')
+	client.pause(1)
 	client.mouseMove(1860,1020)
 	client.mousePress(1)
 	client.pause(0.5)

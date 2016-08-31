@@ -30,9 +30,9 @@ class SystemRestart():
 
 	def system_check(self):
 		if self.have_internet() == False:
-			self.router_reboot() #Record it using selinium-->export to rpi + modifications as in 
-								 #https://www.raspberrypi.org/forums/viewtopic.php?f=63&t=129320 Selinium in headless rpi
-		elif self.site_online() == False:
+			self.router_reboot() 
+		elif self.site_online() =#Record it using selinium-->export to rpi + modifications as in 
+								 #https://www.raspberrypi.org/forums/viewtopic.php?f=63&t=129320 Selinium in headless rpi= False:
 			os.system("sudo reboot")
 		else:
 			return True

@@ -29,19 +29,19 @@ class Doors():
 	def down_door(self,function): #function variable tells whether we want to open or close the door when we call the down_door
 		if function == 1:
 			GPIO.digitalWrite(self.outdoor, GPIO.HIGH)
-			Timer(3,self.down_door,["close"])
+			Timer(3,self.down_door,[0])
 		elif function == 0:
 			GPIO.digitalWrite(self.outdoor, GPIO.LOW)
 
 	def check_status(self): #for up.door which uses the servo
 		if (GPIO.digitalRead(self.d_status) == GPIO.LOW):
-			return "open"
+			return 1 #open
 		elif (GPIO.digitalRead(self.d_status) == GPIO.HIGH):
-			return "close"
+			return 0 #close
 	
 	def update_status(self,counter): # I want self.counter to persist each time I call the function, I need to detect an close/open/close sequence.
-		if (self.check_status() == "close"):
-			if(counter == 0):
+		if (self.check_status() == 0): #update_status polls the door_status pin to detect an "close-open-close" sequence of the door.
+			if(counter == 0): 		   #The door starts closed but unlocked(counter=0), I open it and enter the house(counter=1), then i close the door(counter=2) and the mechanism locks.
 				counter +=1
 
 			elif(counter == 2):
@@ -50,14 +50,14 @@ class Doors():
 
 			Timer(1,self.update_status,[counter])
 		
-		elif (self.check_status() == "open"):
+		elif (self.check_status() == 1):
 			if(counter == 1):
 				counter +=1
 			Timer(1,self.update_status,[counter])
 	
 	def alert(self): #checks whethere status_open = true and plays the alert sound, it calls it self each time
 		if not self.inside:
-			if self.check_status()== "open":
+			if self.check_status()== 1:
 				pygame.mixer.init()
 				pygame.mixer.music.load("path/to/alert.mp3")
 				pygame.mixer.music.play()

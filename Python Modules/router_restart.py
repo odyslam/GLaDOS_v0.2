@@ -7,6 +7,8 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 import unittest, time, re
 
+
+#add code to run on rpi
 class Latest(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
