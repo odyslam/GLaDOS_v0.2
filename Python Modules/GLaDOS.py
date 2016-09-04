@@ -29,7 +29,7 @@ SERVO_STATUS_PIN = 17
 OUTDOOR_PIN = 25
 TRANSMITTER_PIN = 1 # GPIO.1 = pin 18
 DOOR_STATUS_PIN = 24
-INFRARED_PIN =  #just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
+INFRARED_PIN = 16 #just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
 
 
 #GLobal Instances
@@ -58,7 +58,7 @@ def setup():
 	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
 	
 	do.up_door(0)
-	#sysr = subprocess.Popen("sudo python","/home/pi/glados_core/interface/python/system_restart.py") # call subprocess
+	sysr = subprocess.Popen("sudo python /home/pi/glados_core/interface/python/system_restart.py",shell=True) # call subprocess
 	#daemon.process(system_restart.py) #TODO
 def destroy():
 	do.up_door(0)
@@ -78,14 +78,18 @@ def house(enter):
 		do.down_door(1)
 		if pc.status == 0:
 			ap.turn_on_pc
+			Timer(30,pc.vnc_control,["log_in",0,0]).start()
+			Timer(20,pc.vnc_control,["music","morning","chill"]).start()
 		#
 		if (datetime.now().time().hour > 6):
 			ap.set_status("digital","left_light",enter)
 			ap.set_status("digital","right_light",enter)
 		
+		Timer(20,pc.vnc_control,["music","morning","chill"]).start()
 		ap.set_status("digital","tv-hifi",enter)
-		#inf.send("HIFI","KEY_POWER")
-		#inf.send(HIFI,"KEY_COMPUTER")
+		inf.send("ADVANCE_ACOUSTIC","power",1)
+		inf.send("ADVANCE_ACOUSTIC","input_computer",1)
+		inf.send("ADVANCE_ACOUSTIC","volume_up",15)
 	
 	else: #enter = 0 <=> I am exiting the house
 		do.inside = 0
@@ -110,11 +114,11 @@ def gday():
 	ap.set_status("digital","left_light",1)
 	ap.set_status("digital","right_light",1)
 	ap.set_status(digital,"tv-hifi",1)
-	inf.send("HIFI","power",1)
-	inf.send("HIFI","input_computer",1)
-	inf.send("HIFI","volume_up",15)
-	Timer(5,pc.log_in)
-	Timer(10,pc.music,["morning","chill"])
+	inf.send("ADVANCE_ACOUSTIC","power",1)
+	inf.send("ADVANCE_ACOUSTIC","input_computer",1)
+	inf.send("ADVANCE_ACOUSTIC","volume_up",15)
+	Timer(30,pc.vnc_control,["log_in",0,0]).start()
+	Timer(20,pc.vnc_control,["music","morning","chill"]).start()
 @webiopi.macro
 def gnight():
 	ap.set_status("digital","left_light",0)
@@ -171,7 +175,7 @@ def status():
 def desktop_pc(function):
 	function = int(function)
 	if function == 0: 
-		pc.turn_off()
+		pc.vnc_control("turn_off",0,0)
 	if function == 1:
 		ap.turn_on_pc
 

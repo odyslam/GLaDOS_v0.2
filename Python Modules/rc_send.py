@@ -19,4 +19,5 @@ def send(function,socket_number):
 
 
 if __name__ == '__main__':
-	send(sys.argv[2],int(sys.argv[3]))
+	for i in range(1):
+		send(sys.argv[2],int(sys.argv[3]))

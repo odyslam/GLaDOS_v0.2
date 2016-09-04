@@ -15,5 +15,5 @@ class Pc():
 			return 1
 
 	def vnc_control(self,function,time,mood): #function = log_in/shutdown/music + args
-		subprocess.call("path/to/script %s %s %s" %(function,time,mood))
+		subprocess.call("sudo python /home/pi/glados_interface/python/vnc_control.py%s %s %s" %(function,time,mood))
 

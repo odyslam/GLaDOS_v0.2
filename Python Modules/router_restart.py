@@ -6,6 +6,8 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 import unittest, time, re
+from pyvirtualdisplay import Display
+import pyvirtualdisplay
 
 
 #add code to run on rpi
@@ -50,6 +52,9 @@ class Latest(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
+        display.stop()
 
 if __name__ == "__main__":
+    display = Display(visible=0, size=(800, 600))
+    display.start()
     unittest.main()

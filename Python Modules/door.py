@@ -29,7 +29,7 @@ class Doors():
 	def down_door(self,function): #function variable tells whether we want to open or close the door when we call the down_door
 		if function == 1:
 			GPIO.digitalWrite(self.outdoor, GPIO.HIGH)
-			Timer(3,self.down_door,[0])
+			Timer(3,self.down_door,[0]).start()
 		elif function == 0:
 			GPIO.digitalWrite(self.outdoor, GPIO.LOW)
 
@@ -45,27 +45,27 @@ class Doors():
 				counter +=1
 
 			elif(counter == 2):
-				self.up_door(0)
+				Timer(1,self.up_door,[0]).start()
 				return None
 
-			Timer(1,self.update_status,[counter])
+			Timer(1,self.update_status,[counter]).start()
 		
 		elif (self.check_status() == 1):
 			if(counter == 1):
 				counter +=1
-			Timer(1,self.update_status,[counter])
+			Timer(1,self.update_status,[counter]).start()
 	
 	def alert(self): #checks whethere status_open = true and plays the alert sound, it calls it self each time
 		if not self.inside:
 			if self.check_status()== 1:
 				pygame.mixer.init()
-				pygame.mixer.music.load("path/to/alert.mp3")
+				pygame.mixer.music.load("home/pi/glados_interface/resources/alert.mp3")
 				pygame.mixer.music.play()
 				while pygame.mixer.music.get_busy() == True:
 					continue
 				self.alert()
 			else:
-				Timer(1,self.alert)
+				Timer(1,self.alert).start()
 		else:
 			return None
 
