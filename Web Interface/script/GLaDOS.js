@@ -61,6 +61,18 @@ function pc() {
 function light(l_group_status,number){
     statuslist = [l_light_status,r_light_status,o_light_status];
     mode = 1 - statuslist[l_group_status]; /*if status = 1 (on) mode = 0 , turn off the light and vice versa */
+    switch(l_group_status){
+        case 0:
+            l_light_status = mode;
+            break;
+        case 1:
+            r_light_status = mode;
+            break;
+        case 2:
+            o_light_status = mode;
+            break;
+        }
+
     webiopi().callMacro("lights",[number,mode]);}
 
 function heater(time){

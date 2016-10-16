@@ -8,7 +8,7 @@ class Infrared():
 			command = "KEY_POWER"
 		elif command == "input_computer":
 			command = "KEY_COMPUTER"
-		elif command = "volume_up":
+		elif command == "volume_up":
 			command = "KEY_VOLUMEUP"
 		for i in range(times):
 			call(["irsend SEND_ONCE %s %s" % (str(application),str(command))],shell=True)

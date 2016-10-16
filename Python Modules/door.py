@@ -14,17 +14,23 @@ class Doors():
 	 
 	def up_door(self,function):
 		GPIO.digitalWrite(self.servo_power, GPIO.HIGH)
+		webiopi.debug("mpika up_door")
+		webiopi.debug(self.servo_power)
+		Timer(2,GPIO.digitalWrite,[self.servo_power, GPIO.LOW]).start()
 		
 		if function == 1:
+			webiopi.debug("mpika sto open")
+
 			for angle in range(-90,90):
+
 				webiopi.debug(-angle)
 				GPIO.pwmWriteAngle(self.servo,-angle)
 			self.update_status(0) #initialize self.counter ,pass it as an argument
 		elif function == 0:
 			for angle in range(-90,90):
+				webiopi.debug(angle)
 				GPIO.pwmWriteAngle(self.servo,angle)
 	    
-		GPIO.digitalWrite(self.servo_power, GPIO.LOW)
 	
 	def down_door(self,function): #function variable tells whether we want to open or close the door when we call the down_door
 		if function == 1:
@@ -39,14 +45,19 @@ class Doors():
 		elif (GPIO.digitalRead(self.d_status) == GPIO.HIGH):
 			return 0 #close
 	
-	def update_status(self,counter): # I want self.counter to persist each time I call the function, I need to detect an close/open/close sequence.
+	def update_status(self,counter):
+		webiopi.debug("counter:%d" %counter) # I want self.counter to persist each time I call the function, I need to detect an close/open/close sequence.
 		if (self.check_status() == 0): #update_status polls the door_status pin to detect an "close-open-close" sequence of the door.
 			if(counter == 0): 		   #The door starts closed but unlocked(counter=0), I open it and enter the house(counter=1), then i close the door(counter=2) and the mechanism locks.
 				counter +=1
 
 			elif(counter == 2):
-				Timer(1,self.up_door,[0]).start()
-				return None
+				counter +=1
+
+			elif(counter == 3):
+				self.up_door(0)
+				return 
+				#Timer(1,self.up_door,[0]).start()
 
 			Timer(1,self.update_status,[counter]).start()
 		
@@ -59,7 +70,7 @@ class Doors():
 		if not self.inside:
 			if self.check_status()== 1:
 				pygame.mixer.init()
-				pygame.mixer.music.load("home/pi/glados_interface/resources/alert.mp3")
+				pygame.mixer.music.load("/home/pi/glados_interface/resources/alert1.mp3")
 				pygame.mixer.music.play()
 				while pygame.mixer.music.get_busy() == True:
 					continue

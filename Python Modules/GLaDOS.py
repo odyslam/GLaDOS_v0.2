@@ -18,17 +18,17 @@ GPIO = webiopi.GPIO
 
 #CONSTANTS
 
-PC_ADDRESS = "http://192.168.1.20"
+PC_ADDRESS = "192.168.1.20"
 ESP8266_ADDRESS = "http://192.168.1.30"
 HEATER_SOCKET = 3 
 
 #PINS
 
-SERVO_PIN = 27
-SERVO_STATUS_PIN = 17
-OUTDOOR_PIN = 25
+SERVO_PIN = 6
+SERVO_STATUS_PIN = 5
+OUTDOOR_PIN = 23
 TRANSMITTER_PIN = 1 # GPIO.1 = pin 18
-DOOR_STATUS_PIN = 24
+DOOR_STATUS_PIN = 22
 INFRARED_PIN = 16 #just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
 
 
@@ -58,8 +58,7 @@ def setup():
 	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
 	
 	do.up_door(0)
-	sysr = subprocess.Popen("sudo python /home/pi/glados_core/interface/python/system_restart.py",shell=True) # call subprocess
-	#daemon.process(system_restart.py) #TODO
+	sysr = subprocess.Popen("sudo python /home/pi/glados_interface/python/system_restart.py",shell=True) # call subprocess
 def destroy():
 	do.up_door(0)
 	he.turn_off()
@@ -77,19 +76,31 @@ def house(enter):
 		do.inside = 1
 		do.down_door(1)
 		if pc.status == 0:
-			ap.turn_on_pc
-			Timer(30,pc.vnc_control,["log_in",0,0]).start()
-			Timer(20,pc.vnc_control,["music","morning","chill"]).start()
-		#
-		if (datetime.now().time().hour > 6):
+			ap.turn_on_pc 
+			
+		Timer(20,pc.vnc_control,["log_in",0,0]).start()
+		
+		mood = chill  #General use
+		time = 0
+		
+		if (datetime.now().time().hour >= 10):
+			Timer(20,pc.vnc_control,["music"," ","romance"]).start()
+			time = 0
+			mood = "romance" #I enter home late-night with company
 			ap.set_status("digital","left_light",enter)
 			ap.set_status("digital","right_light",enter)
 		
-		Timer(20,pc.vnc_control,["music","morning","chill"]).start()
+		elif (datetime.now().time().hour >= 6): #I enter home propably exhuaster from class/workout
+			ap.set_status("digital","left_light",enter)
+			ap.set_status("digital","right_light",enter)
+			time = "night"
+			mood = 0 
+		
+		Timer(50,pc.vnc_control,["music",time,mood]).start()
 		ap.set_status("digital","tv-hifi",enter)
 		inf.send("ADVANCE_ACOUSTIC","power",1)
 		inf.send("ADVANCE_ACOUSTIC","input_computer",1)
-		inf.send("ADVANCE_ACOUSTIC","volume_up",15)
+		Timer(3,inf.send,["ADVANCE_ACOUSTIC","volume_up",10]).start()
 	
 	else: #enter = 0 <=> I am exiting the house
 		do.inside = 0
@@ -101,7 +112,9 @@ def house(enter):
 		Timer(10,do.alert)
 @webiopi.macro
 def open_door(door):
+	door = int(door)
 	if door == 1:
+		webiopi.debug("mpika open_door")
 		do.up_door(1)
 	elif door == 2:
 		do.down_door(1)
@@ -113,12 +126,13 @@ def gday():
 		ap.turn_on_pc
 	ap.set_status("digital","left_light",1)
 	ap.set_status("digital","right_light",1)
-	ap.set_status(digital,"tv-hifi",1)
+	ap.set_status("digital","tv-hifi",1)
 	inf.send("ADVANCE_ACOUSTIC","power",1)
 	inf.send("ADVANCE_ACOUSTIC","input_computer",1)
-	inf.send("ADVANCE_ACOUSTIC","volume_up",15)
-	Timer(30,pc.vnc_control,["log_in",0,0]).start()
-	Timer(20,pc.vnc_control,["music","morning","chill"]).start()
+	Timer(3,inf.send,["ADVANCE_ACOUSTIC","volume_up",8]).start()
+	inf.send("ADVANCE_ACOUSTIC","volume_up",10)
+	Timer(20,pc.vnc_control,["log_in",0,0]).start()
+	Timer(50,pc.vnc_control,["music","morning","chill"]).start()
 @webiopi.macro
 def gnight():
 	ap.set_status("digital","left_light",0)
@@ -155,9 +169,11 @@ def lights(number,function): #function = 1 or 0, on/off
 		socket2_status = function
 		#rc2.send(function)
 	elif number == 3:
-		ap.set_status("digital","left_light",function)
+		ret=ap.set_status("digital","left_light",function)
+		webiopi.debug("return value of function:%d is %d" %(function,ret))
 	elif number == 4:
-		ap.set_status("digital","right_light",function)
+		ret=ap.set_status("digital","right_light",function)
+		webiopi.debug("return value of function:%d is %d" %(function,ret))
 
 @webiopi.macro
 def status():

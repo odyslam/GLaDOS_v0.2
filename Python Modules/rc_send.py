@@ -5,7 +5,7 @@ import sys
 #pin socket function
 
 socket_on = ("000000010100010001010101","000000010101000001010101","000000010001010001010101")
-socket_off = ("000000010100010001010100","000000010101000001010100","000000010001010001010100")
+socket_off =("000000010100010001010100","000000010101000001010100","000000010001010001010100")
 sender = pi_switch.RCSwitchSender()
 sender.enableTransmit(int(sys.argv[1]))
 
@@ -21,3 +21,4 @@ def send(function,socket_number):
 if __name__ == '__main__':
 	for i in range(1):
 		send(sys.argv[2],int(sys.argv[3]))
+	sys.exit()

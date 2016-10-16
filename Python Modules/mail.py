@@ -17,7 +17,6 @@ class Mail_Client():
 
 
 	def send_mail(address,subject,message):
-	global FORTHNET_USERNAME
 	with open(textfile) as fp:
 		fp.write(message)
 		msg = MIMEText(fp.read())
