@@ -155,6 +155,7 @@ def heater(mode,time):
 
 @webiopi.macro
 def lights(number,function): #function = 1 or 0, on/off
+	global socket1_status,socket2_status
 	number = int(number)
 	function = int(function)
 	if number == 1:
