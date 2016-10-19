@@ -29,7 +29,7 @@ SERVO_STATUS_PIN = 5
 OUTDOOR_PIN = 23
 TRANSMITTER_PIN = 1 # GPIO.1 = pin 18
 DOOR_STATUS_PIN = 22
-INFRARED_PIN = 16 #just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
+INFRARED_PIN = 25 #just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
 
 
 #GLobal Instances
@@ -45,6 +45,7 @@ he = heater.Heater(HEATER_SOCKET,TRANSMITTER_PIN)
 
 socket1_status = 0
 socket2_status = 0
+glo_inside = 0
 
 def setup():
 	webiopi.debug("Setup")
@@ -52,14 +53,15 @@ def setup():
 	GPIO.setFunction(OUTDOOR_PIN, GPIO.OUT)
 	GPIO.setFunction(SERVO_STATUS_PIN, GPIO.OUT)
 	GPIO.setFunction(SERVO_PIN, GPIO.PWM)
-	GPIO.setFunction(DOOR_STATUS_PIN, GPIO.IN)	
-
+	GPIO.setFunction(DOOR_STATUS_PIN, GPIO.IN,GPIO.PUD_DOWN)	
 	GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
 	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
 	
 	do.up_door(0)
 	sysr = subprocess.Popen("sudo python /home/pi/glados_interface/python/system_restart.py",shell=True) # call subprocess
 def destroy():
+	GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
+	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
 	do.up_door(0)
 	he.turn_off()
 
@@ -68,27 +70,33 @@ def destroy():
 
 @webiopi.macro
 def house(enter):
+	global glo_inside
 	enter = int(enter)
 	webiopi.debug("type of enter=%s" %type(enter))
 	do.up_door(enter)
 	if enter == 1:
 		webiopi.debug("entering house") #i am entering the house
-		do.inside = 1
+		glo_inside = 1
 		do.down_door(1)
 		if pc.status == 0:
-			ap.turn_on_pc 
-			
+			ap.turn_on_pc() 
 		Timer(20,pc.vnc_control,["log_in",0,0]).start()
 		
-		mood = chill  #General use
+		ap.set_status("digital","tv-hifi",enter)
+		inf.send("ADVANCE_ACOUSTIC","power",1)
+		inf.send("ADVANCE_ACOUSTIC","input_computer",1)
+		Timer(3,inf.send,["ADVANCE_ACOUSTIC","volume_up",10]).start()
+		
+		mood = "chill"  #General use
 		time = 0
 		
 		if (datetime.now().time().hour >= 10):
-			Timer(20,pc.vnc_control,["music"," ","romance"]).start()
+			Timer(40,pc.vnc_control,["music","0","romance"]).start()
 			time = 0
 			mood = "romance" #I enter home late-night with company
 			ap.set_status("digital","left_light",enter)
 			ap.set_status("digital","right_light",enter)
+			romance = 1
 		
 		elif (datetime.now().time().hour >= 6): #I enter home propably exhuaster from class/workout
 			ap.set_status("digital","left_light",enter)
@@ -96,14 +104,13 @@ def house(enter):
 			time = "night"
 			mood = 0 
 		
-		Timer(50,pc.vnc_control,["music",time,mood]).start()
-		ap.set_status("digital","tv-hifi",enter)
-		inf.send("ADVANCE_ACOUSTIC","power",1)
-		inf.send("ADVANCE_ACOUSTIC","input_computer",1)
-		Timer(3,inf.send,["ADVANCE_ACOUSTIC","volume_up",10]).start()
+		if (not rommance):
+			Timer(40,pc.vnc_control,["music",time,mood]).start()
+		
+		romance = 0
 	
 	else: #enter = 0 <=> I am exiting the house
-		do.inside = 0
+		glo_inside = 0
 		webiopi.debug("leaving house")
 		ap.set_status("digital","left_light",enter)
 		ap.set_status("digital","right_light",enter)
@@ -122,22 +129,35 @@ def open_door(door):
 
 @webiopi.macro
 def gday():
+	global socket1_status
 	if pc.status == 0:
-		ap.turn_on_pc
+		ap.turn_on_pc()
+	ret = subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"1",str(1))],shell=True)
+	if ret !=0:
+		webiopi.debug("can't call rc_send")
+	socket1_status = 1
+	ap.set_status("digital","tv-hifi",1)
 	ap.set_status("digital","left_light",1)
 	ap.set_status("digital","right_light",1)
-	ap.set_status("digital","tv-hifi",1)
 	inf.send("ADVANCE_ACOUSTIC","power",1)
 	inf.send("ADVANCE_ACOUSTIC","input_computer",1)
 	Timer(3,inf.send,["ADVANCE_ACOUSTIC","volume_up",8]).start()
-	inf.send("ADVANCE_ACOUSTIC","volume_up",10)
+	
 	Timer(20,pc.vnc_control,["log_in",0,0]).start()
-	Timer(50,pc.vnc_control,["music","morning","chill"]).start()
+	Timer(40,pc.vnc_control,["music","morning","chill"]).start()
+
 @webiopi.macro
 def gnight():
+	global socket1_status
 	ap.set_status("digital","left_light",0)
 	ap.set_status("digital","right_light",0)
 	ap.set_status("digital","tv-hifi",0)
+	ret = subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"0",str(1))],shell=True)
+	if ret !=0:
+		webiopi.debug("can't call rc_send")
+	socket1_status = 0
+
+
 
 @webiopi.macro
 def heater(mode,time):
@@ -178,6 +198,8 @@ def lights(number,function): #function = 1 or 0, on/off
 
 @webiopi.macro
 def status():
+	global glo_inside
+	do.inside = glo_inside
 	a = ap.get_status("digital","left_light")
 	b = ap.get_status("digital","right_light")
 	el_time = he.elapsed_time()
@@ -187,14 +209,14 @@ def status():
 	
 	#socket1 socket2 left_light right_light pc inside heater elapsed_time
 	
-	return json.dumps([socket1_status,socket2_status,a,b,c,do.inside,he_stat,el_time], separators=(',',':'))
+	return json.dumps([socket1_status,socket2_status,a,b,c,glo_inside,he_stat,el_time], separators=(',',':'))
 @webiopi.macro
 def desktop_pc(function):
 	function = int(function)
 	if function == 0: 
 		pc.vnc_control("turn_off",0,0)
 	if function == 1:
-		ap.turn_on_pc
+		ap.turn_on_pc()
 
 	if function == "status": #status = 1/0
 		status = pc.status()

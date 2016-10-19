@@ -104,3 +104,12 @@ function countdown_clock(seconds){
         countdown: true
     });
 }
+
+
+function test_door(){
+    var intervalID = window.setInterval(pin_return, 500);
+    
+}
+function pin_return(){
+    console.log(webiopi().digitalRead(22))
+}

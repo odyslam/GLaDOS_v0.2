@@ -7,11 +7,12 @@ import random
 def music(time,mood): #uses spotify window
 	music = []
 	if time == "morning":
-		music.append("morning acoustic")
+		music.append("spotify:user:spotify:playlist:7EtGvEVYkL6knEdLxNjHf3")
 		music.append("spotify:user:spotify:playlist:3J3mTk0N0NzDOFgnp67Z75")
+		music.apend("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C") #electropose
 
 	elif time == "night":
-		music.append("late night jazz")
+		music.append("spotify:user:spotify:playlist:2clF8IuETuB6DzmQn7I4RM")
 		music.append("spotify:user:spotify:playlist:3J3mTk0N0NzDOFgnp67Z75")
 		music.append("spotify:user:11141301673:playlist:6xfhIWSeRW24HJfHvWaiGM")
 
@@ -19,6 +20,8 @@ def music(time,mood): #uses spotify window
 		music.append("spotify:user:11141301673:playlist:58x34vXnrK8YQQAvkqpqRB")
 		music.append("spotify:user:11141301673:playlist:6eboyL7VOwgbYxHhbFD34u")
 		music.append("spotify:user:spotify:playlist:3J3mTk0N0NzDOFgnp67Z75")
+		music.append("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C")
+		music.append("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C") #electropose
 	if mood == "romance":
 		music.append("spotify:user:11141301673:playlist:6xfhIWSeRW24HJfHvWaiGM")
 
@@ -36,7 +39,7 @@ def music(time,mood): #uses spotify window
 		client.keyPress(i)
 	client.pause(0.3)
 	client.keyPress('enter')
-	client.pause(0.5)
+	client.pause(1.5)
 	client.mouseMove(500,300)
 	client.mousePress(1)
 	for i in range(2): 
@@ -59,6 +62,7 @@ def turn_off(dummy1,dummy2):
 	client.pause(0.5)
 	client.mouseMove(1860,960)
 	client.mousePress(1)
+	client.keyPress('enter')
 
 	#client.mouseMove(20,1060)
 	#client.mousePress(1)

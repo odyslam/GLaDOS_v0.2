@@ -7,7 +7,7 @@ class Infrared():
 		if command == "power":
 			command = "KEY_POWER"
 		elif command == "input_computer":
-			command = "KEY_COMPUTER"
+			command = "KEY_PC"
 		elif command == "volume_up":
 			command = "KEY_VOLUMEUP"
 		for i in range(times):

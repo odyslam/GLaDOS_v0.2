@@ -59,12 +59,12 @@ class Doors():
 				return 
 				#Timer(1,self.up_door,[0]).start()
 
-			Timer(1,self.update_status,[counter]).start()
+			Timer(0.5,self.update_status,[counter]).start()
 		
 		elif (self.check_status() == 1):
 			if(counter == 1):
 				counter +=1
-			Timer(1,self.update_status,[counter]).start()
+			Timer(0.5,self.update_status,[counter]).start()
 	
 	def alert(self): #checks whethere status_open = true and plays the alert sound, it calls it self each time
 		if not self.inside:
