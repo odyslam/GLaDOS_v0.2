@@ -1,6 +1,7 @@
 from vncdotool import api
 import sys
 import random
+#from threading import Timer
 
 
 
@@ -9,7 +10,7 @@ def music(time,mood): #uses spotify window
 	if time == "morning":
 		music.append("spotify:user:spotify:playlist:7EtGvEVYkL6knEdLxNjHf3")
 		music.append("spotify:user:spotify:playlist:3J3mTk0N0NzDOFgnp67Z75")
-		music.apend("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C") #electropose
+		music.append("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C") #electropose
 
 	elif time == "night":
 		music.append("spotify:user:spotify:playlist:2clF8IuETuB6DzmQn7I4RM")
@@ -37,9 +38,9 @@ def music(time,mood): #uses spotify window
 	client.pause(0.5)
 	for i in playlist:
 		client.keyPress(i)
-	client.pause(0.3)
+	client.pause(0.5)
 	client.keyPress('enter')
-	client.pause(1.5)
+	client.pause(2.5)
 	client.mouseMove(500,300)
 	client.mousePress(1)
 	for i in range(2): 
@@ -48,13 +49,16 @@ def music(time,mood): #uses spotify window
 
 def log_in(dummy1,dummy2):
 	#must wait 30-40 sec for pc to boot
-	client.keyPress('enter')
-	client.pause(0.5)
+	for i in range(2):
+		client.keyPress('enter')
+	client.pause(1)
 	for i in "1556":
 		client.keyPress(i)
 	#must wait at least 10 sec for pc to log in 
 
 def turn_off(dummy1,dummy2):
+	
+	client.pause(1)
 	client.keyPress('ctrl-alt-del')
 	client.pause(1)
 	client.mouseMove(1860,1020)
@@ -62,7 +66,9 @@ def turn_off(dummy1,dummy2):
 	client.pause(0.5)
 	client.mouseMove(1860,960)
 	client.mousePress(1)
-	client.keyPress('enter')
+	client.pause(1)
+	#Timer(5,turn_off,[0,0]).start()
+
 
 	#client.mouseMove(20,1060)
 	#client.mousePress(1)

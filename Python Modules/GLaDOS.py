@@ -73,50 +73,56 @@ def house(enter):
 	global glo_inside
 	enter = int(enter)
 	webiopi.debug("type of enter=%s" %type(enter))
-	do.up_door(enter)
+	do.up_door(1)
 	if enter == 1:
 		webiopi.debug("entering house") #i am entering the house
 		glo_inside = 1
 		do.down_door(1)
-		if pc.status == 0:
+		for i in range(2):
+			ap.set_status("digital","tv-hifi",enter)
+		if pc.status() == 0:
 			ap.turn_on_pc() 
-		Timer(20,pc.vnc_control,["log_in",0,0]).start()
 		
-		ap.set_status("digital","tv-hifi",enter)
-		inf.send("ADVANCE_ACOUSTIC","power",1)
-		inf.send("ADVANCE_ACOUSTIC","input_computer",1)
-		Timer(3,inf.send,["ADVANCE_ACOUSTIC","volume_up",10]).start()
+		Timer(5,inf.send,["ADVANCE_ACOUSTIC","power",1]).start()	
+		Timer(10,inf.send,["ADVANCE_ACOUSTIC","input_computer",1]).start()
+		Timer(20,inf.send,["ADVANCE_ACOUSTIC","volume_up",10]).start()
+		Timer(45,pc.vnc_control,["log_in",0,0]).start()
 		
-		mood = "chill"  #General use
+
+		mood = "chill"
+		romance = 0  #General use
 		time = 0
-		
-		if (datetime.now().time().hour >= 10):
-			Timer(40,pc.vnc_control,["music","0","romance"]).start()
+		hour = datetime.now().time().hour 
+		if (hour >= 22):
+			webiopi.debug("mpika romance enter")
+			Timer(70,pc.vnc_control,["music","0","romance"]).start()
 			time = 0
 			mood = "romance" #I enter home late-night with company
 			ap.set_status("digital","left_light",enter)
-			ap.set_status("digital","right_light",enter)
+			subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"1",str(1))],shell=True)
 			romance = 1
-		
-		elif (datetime.now().time().hour >= 6): #I enter home propably exhuaster from class/workout
-			ap.set_status("digital","left_light",enter)
 			ap.set_status("digital","right_light",enter)
+		
+		elif (hour >= 16): #I enter home propably exhuaster from class/workout
+			ap.set_status("digital","left_light",enter)
+			subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"1",str(1))],shell=True)
 			time = "night"
 			mood = 0 
+			ap.set_status("digital","right_light",enter)
 		
-		if (not rommance):
-			Timer(40,pc.vnc_control,["music",time,mood]).start()
 		
-		romance = 0
+		if (not romance):
+			Timer(70,pc.vnc_control,["music",time,mood]).start()
 	
 	else: #enter = 0 <=> I am exiting the house
 		glo_inside = 0
 		webiopi.debug("leaving house")
 		ap.set_status("digital","left_light",enter)
 		ap.set_status("digital","right_light",enter)
+		subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"0",str(1))],shell=True)
 		ap.set_status("digital","tv-hifi",enter)
-		#
-		Timer(10,do.alert)
+		Timer(10,do.alert).start()
+
 @webiopi.macro
 def open_door(door):
 	door = int(door)
@@ -130,21 +136,20 @@ def open_door(door):
 @webiopi.macro
 def gday():
 	global socket1_status
-	if pc.status == 0:
+	ap.set_status("digital","tv-hifi",1)
+	if pc.status() == 0:
 		ap.turn_on_pc()
+	#ap.set_status("digital","left_light",1)	
 	ret = subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"1",str(1))],shell=True)
 	if ret !=0:
 		webiopi.debug("can't call rc_send")
 	socket1_status = 1
-	ap.set_status("digital","tv-hifi",1)
-	ap.set_status("digital","left_light",1)
-	ap.set_status("digital","right_light",1)
+	#ap.set_status("digital","right_light",1)
 	inf.send("ADVANCE_ACOUSTIC","power",1)
-	inf.send("ADVANCE_ACOUSTIC","input_computer",1)
-	Timer(3,inf.send,["ADVANCE_ACOUSTIC","volume_up",8]).start()
-	
-	Timer(20,pc.vnc_control,["log_in",0,0]).start()
-	Timer(40,pc.vnc_control,["music","morning","chill"]).start()
+	Timer(10,inf.send,["ADVANCE_ACOUSTIC","input_computer",1]).start()
+	Timer(20,inf.send,["ADVANCE_ACOUSTIC","volume_up",8]).start()
+	Timer(40,pc.vnc_control,["log_in",0,0]).start()
+	Timer(60,pc.vnc_control,["music","morning","chill"]).start()
 
 @webiopi.macro
 def gnight():

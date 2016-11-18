@@ -28,7 +28,7 @@ class Api():
 			pin = RIGHT_LIGHT_PIN
 		pin = str(pin)
 		try:
-			resp = requests.get(self.address + "/" + function + "/" + pin,timeout=0.01)
+			resp = requests.get(self.address + "/" + function + "/" + pin,timeout=0.07)
 			if resp.status_code !=200:
 				webiopi.debug("can't get status from api")
 			answer = resp.json()

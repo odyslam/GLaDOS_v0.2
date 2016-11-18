@@ -34,11 +34,24 @@ function set_status(){
     document.getElementById("myonoffswitch4").checked = heater_status;
     document.getElementById("myonoffswitch5").checked = heater_status;}
  function house(enter){
-     webiopi().callMacro("house",[enter]);
+    var i = confirm ("Oppening Doors, please confirm")
+    if (i==true){
+        webiopi().callMacro("house",[enter]);
+    }
+    else{
+        location.reload();
+    }
+     
  }
 
 function doors(door){
-    webiopi().callMacro("open_door",[door]);
+    var i = confirm ("Oppening Doors, please confirm")
+    if (i==true){
+        webiopi().callMacro("open_door",[door]);
+    }
+    else{
+        location.reload();
+    }
 
 }
 function time_day(gday){
