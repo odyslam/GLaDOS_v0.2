@@ -200,7 +200,11 @@ def lights(number,function): #function = 1 or 0, on/off
 	elif number == 4:
 		ret=ap.set_status("digital","right_light",function)
 		webiopi.debug("return value of function:%d is %d" %(function,ret))
-
+@webiopi.macro
+def status_test():
+	dicta = {"a":1,"b":2}
+	return json.dumps(dicta,separators=(',',':'))
+	
 @webiopi.macro
 def status():
 	global glo_inside

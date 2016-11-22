@@ -11,6 +11,14 @@ webiopi().ready(function() {
 function get_status(){
      webiopi().callMacro("status",[],store_status);}
 
+function get_status_test(){
+    webiopi().callMacro("status_test",[],store_status_test);}
+
+function store_status_test(macro,args,data){
+    console.log(data);
+    data = JSON.parse(data)
+    console.log(data['a']);
+}
 function store_status(macro,args,data) {
     console.log("data:"+ data)
      o_light_status = parseInt(data[1]);
