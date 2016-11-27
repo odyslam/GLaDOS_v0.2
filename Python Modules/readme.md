@@ -25,3 +25,6 @@ python2 scripts that used pi_switch library to send rf signals, it's called via 
 
 ##system_restart: 
 Thanks to selenium and httplib it will check whether rpi2 has internet or the server is online and will either reboot the router or reboot the rpi.
+
+##Fb_bot:
+A scripts that addes facebook bot implementation to the project. Using #fbchat to relay messages to/from facebook messenger and pywit(wit) as the NLP. Added Functionality with limitless possibilities.
