@@ -10,22 +10,26 @@ class GladosBot(fbchat.Client):
     def __init__(self,email, password,debug=True, user_agent=None):
         fbchat.Client.__init__(self,email, password, debug, user_agent)
         self.authorised_names = ["odysseas lamtzidis"]
-        self.conversations = {"odysseas lamtzidis":0} #counts the individual conversations with the bot
+        self.conversations = {"odysseas lamtzidis":1} #counts the individual conversations with the bot
         self.authorised_update()
         self.ip_address = "htttp://odys:defiler007@192.168.1.19:5000"
 
     def authorised_update(self):
         self.authorised_id = {}
+        self.authorised_idrev = {}
         for name in self.authorised_names:
-            self.authorised_id[name] = client.getUsers(name)[0].uid
-            if not in self.conversations:
+            self.authorised_id[name] = str(self.getUsers(name)[0].uid)
+            self.authorised_idrev[self.authorised_id[name]] = name
+            print self.authorised_id
+            print self.authorised_idrev
+            if not name in self.conversations:
                 self.conversations[name] = 0
 
         Timer(30*60,self.authorised_update,[]).start()
 
     def wit_start(self,token):
-        self.actions = {
-            'sendmessage':  self.sendmessage,
+        actions = {
+            'send':  self.sendmessage,
             'heater':       self.story_heater,
             'doors' :       self.story_doors,
             'hifi'  :       self.story_hifi,
@@ -34,11 +38,11 @@ class GladosBot(fbchat.Client):
 
 
         }
+        self.actions = actions
+        self.wit = Wit(access_token=token, actions=actions)
+        self.context = {}
         
-        self.wit_token = token
-        self.wit = Wit(access_token=self.wit_token, actions=self.actions)
-        
-    def first_entity_value(entities, entity):
+    def first_entity_value(self,entities, entity):
         if entity not in entities:
             return None
         val = entities[entity][0]['value']
@@ -47,22 +51,34 @@ class GladosBot(fbchat.Client):
         return val['value'] if isinstance(val, dict) else val
     
     def on_message(self, mid, author_id, author_name, message, metadata):
-        self.author_id = author_id
+        self.author_id = str(author_id)
         self.markAsDelivered(author_id, mid) #mark delivered
         self.markAsRead(author_id) 
         self.message = message
+       # print self.message
         self.author_name = author_name
-        if author_id not in self.authorised_id.values():
-            self.send(self.author_id,"Δεν έχεις άδεια επικοινωνίας, αποστέλω τα στοιχεία σου στον υπεύθηνο")
-            self.send(self.authorised_id["odysseas lamtzidis"],"ο " + str(self.author_name) + " μου έστειλε αυτό \"" + message + "\"")
-        else:
-            self.call_wit
+        #print author_name
+        if str(author_id) != str(self.uid):
+            if str(author_id) not in str(self.authorised_id.values()):
+                #print ("authid:"+ç str(author_id)+"kai value:" + str(self.authorised_id["odysseas lamtzidis"]))
+                self.send(self.author_id,"Δεν έχεις άδεια επικοινωνίας, αποστέλω τα στοιχεία σου στον υπεύθηνο")
+                #print self.author_id
+                #print self.authorised_id["odysseas lamtzidis"]
+                self.send(self.authorised_id["odysseas lamtzidis"],"lol")
+            else:
+                #print self.author_id
+                #print self.authorised_id["odysseas lamtzidis"]
+                self.call_wit()
 
             #wit api-->message_analysis-->action
 
     def call_wit(self):
-        self.session_id = self.author_name + "-number:" + str(self.conversations[self.author_name])
-        self.context = client.run_actions(self.session_id,self.message, self.context)
+        auth_name = self.authorised_idrev[self.author_id]
+        conv_number = self.conversations[auth_name]
+        self.session_id = str(self.authorised_idrev[self.author_id]) + '-number:' + str(conv_number)
+        self.session_id = self.session_id.replace(" ","-")
+        print self.session_id
+        self.context = self.wit.run_actions(self.session_id,self.message, self.context)
 
     def end(self):
         self.context = {}
@@ -70,43 +86,43 @@ class GladosBot(fbchat.Client):
     
     def sendmessage(self,request,response):
         if str(self.author_id) != str(self.uid):
-            message = reponse['text']
-            self.send(self.target_id,message)
+            message = response['text']
+            self.send(self.author_id,message)
 
-    def macro_call(self,macro,args):
-        if macro == "heater":
-            if args[1] == "hours":
-                args[0] = args[0] * 60
-                args[0] = str(time)
+    def macro_call(self,macro,args = None):
+       # url = self.ip_address + "/macros/" + macro + "/"
+        #if args:
+        #    for i in range(len(args)):
+         #       url = url + str(args[i])
+          #      if not i == (len(args)-1):
+           #         url = url + ","
 
-        url = self.ip_address + "/macros/" + macro + "/"
-        if args:
-            for i in range(len(args)):
-                url = url + str(args[i])
-                if not i == (len(args)-1):
-                    url = url + ","
-         r=reuqests.post(url)
+       # req=reuqests.post(url)
+       return None
 
-    
     def story_doors(self,request):
         self.context = request['context']
         self.entities = request['entities']
 
-        act = first_entity_value(self.entities,'action')
-        sent = first_entity_value(self.entities'sentiment')
-        door = str(first_entity_value(self.entities'doors'))
-        if sent == "positive"
+        act = self.first_entity_value(self.entities,'action')
+        sent = self.first_entity_value(self.entities,'sentiment')
+        door = str(self.first_entity_value(self.entities,'doors'))
+        if sent == "positive":
             self.context['s_positive'] = True
         else:
             self.context['s_negative'] = True
         self.context[door] = True
+        if door == "doors":
+            self.macro_call("house",[1])
+        elif door == "door":
+            self.macro_call("open_door",[1])
 
         return self.context
 
     def story_authorise(self,request):
         self.context = request['context']
         self.entities = request['entities']
-        action = first_entity_value(self.entities,'action')
+        action = self.first_entity_value(self.entities,'action')
         if action == "authorise":
             self.authorised_names.append(name)
         elif action == "deauthorise":
@@ -119,22 +135,29 @@ class GladosBot(fbchat.Client):
         self.context = request['context']
         self.entities = request['entities']
         
-        act = first_entity_value(self.entities,'action')
-        sent = first_entity_value(self.entities,'sentiment')
-        time = int(first_entity_value(self.entities,'time_custom'))
-        timetype = first_entity_value(self.entities,'time_type')
-        if (time && timetype):
-            self.context('ctime') = str(time)
-            if sent == "positive"
-                self.context('s_positive') = True
+        act = self.first_entity_value(self.entities,'action')
+        sent = self.first_entity_value(self.entities,'sentiment')
+        try:
+            time = int(self.first_entity_value(self.entities,'time_custom'))
+        except:
+            time = None
+        timetype = self.first_entity_value(self.entities,'time_type')
+        if (time and timetype):
+            self.context['ctime'] = str(time)
+            if sent == "positive":
+                self.context['s_positive'] = True
             else:
-                self.context('s_negative') = True
+                self.context['s_negative'] = True
+            if timetype == "hours":
+                time = int(time) * 60
+            self.macro_call("heater",[1,time])
         elif not time:
-            self.context('no_ctime') = True
-
+            print("notime")
+            self.context['no_ctime'] = True
         return self.context
  
-
+    def story_hifi(self,request):
+        print hifi
             
 
 bot = GladosBot("odyslam@icloud.com","glados007")
