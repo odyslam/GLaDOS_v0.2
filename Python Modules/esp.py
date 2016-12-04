@@ -51,8 +51,9 @@ class Api():
 		elif pin == "right_light":
 			pin = RIGHT_LIGHT_PIN
 		try:
-			resp = requests.get(self.address + "/" + function + "/" + pin + "/" + status,timeout=0.01)
-			answer = resp.json()
+			for i in range(2):
+				resp = requests.get(self.address + "/" + function + "/" + pin + "/" + status,timeout=0.01)
+				answer = resp.json()
 			return int(answer["return_value"])
 		except:
 			webiopi.debug("connection error with set_status")

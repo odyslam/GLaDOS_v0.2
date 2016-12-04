@@ -16,15 +16,15 @@ def music(time,mood): #uses spotify window
 		music.append("spotify:user:spotify:playlist:2clF8IuETuB6DzmQn7I4RM")
 		music.append("spotify:user:spotify:playlist:3J3mTk0N0NzDOFgnp67Z75")
 		music.append("spotify:user:11141301673:playlist:6xfhIWSeRW24HJfHvWaiGM")
-
-	if mood == "chill":
+	if mood == "romance":
+		music = ["spotify:user:11141301673:playlist:6xfhIWSeRW24HJfHvWaiGM"]
+	
+	elif mood == "chill":
 		music.append("spotify:user:11141301673:playlist:58x34vXnrK8YQQAvkqpqRB")
 		music.append("spotify:user:11141301673:playlist:6eboyL7VOwgbYxHhbFD34u")
 		music.append("spotify:user:spotify:playlist:3J3mTk0N0NzDOFgnp67Z75")
 		music.append("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C")
-		music.append("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C") #electropose
-	if mood == "romance":
-		music.append("spotify:user:11141301673:playlist:6xfhIWSeRW24HJfHvWaiGM")
+		music.append("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C") #electropose #netflix&chill
 
 	playlist = random.sample(music,1).pop()
 
@@ -42,6 +42,7 @@ def music(time,mood): #uses spotify window
 	client.keyPress('enter')
 	client.pause(2.5)
 	client.mouseMove(500,300)
+	client.pause(1)
 	client.mousePress(1)
 	for i in range(2): 
 		client.keyPress('lctrl-l')
@@ -67,6 +68,7 @@ def turn_off(dummy1,dummy2):
 	client.mouseMove(1860,960)
 	client.mousePress(1)
 	client.pause(1)
+	client.keyPress('enter')
 	#Timer(5,turn_off,[0,0]).start()
 
 

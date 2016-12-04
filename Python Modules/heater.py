@@ -17,18 +17,27 @@ class Heater():
 		self.runtime = runtime
 		self.heater_start = time.time()
 		webiopi.debug("heater will turn of in %d seconds" %runtime)
-		Timer(self.runtime, self.turn_off).start()
+		self.heat_timer = Timer(self.runtime, self.turn_off)
+		self.heat_timer.start()
 		ret=call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" % (str(self.tran_pin),"1",str(self.socket_number))],shell=True)
 		if ret !=0:
 			webiopi.debug("can't call rc_send")
 		#self.rc.send(self.socket_number,"on")
 		self.heater_status = 1
+	
 	def turn_off(self):
 		webiopi.debug("turning off heater....")
 		ret=call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" % (str(self.tran_pin),"0",str(self.socket_number))],shell=True)
 		if ret !=0:
 			webiopi.debug("can't call rc_send")
 		self.heater_status = 0
+		if self.heat_timer.is_alive():
+			webiopi.debug("Canceling Timer")
+			self.heat_timer.cancel()
+			webiopi.debug("TIMER IS NOW:")
+
+
+
 
 	def elapsed_time(self):
 		if self.heater_status == 0:

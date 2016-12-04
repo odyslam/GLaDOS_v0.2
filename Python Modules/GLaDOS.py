@@ -87,41 +87,39 @@ def house(enter):
 		Timer(10,inf.send,["ADVANCE_ACOUSTIC","input_computer",1]).start()
 		Timer(20,inf.send,["ADVANCE_ACOUSTIC","volume_up",10]).start()
 		Timer(45,pc.vnc_control,["log_in",0,0]).start()
+		lights(1,1)
 		
 
 		mood = "chill"
-		romance = 0  #General use
 		time = 0
-		hour = datetime.now().time().hour 
-		if (hour >= 22):
+		hour = int(datetime.now().time().hour )
+		
+		if (hour >= 22 or hour <= 7):
 			webiopi.debug("mpika romance enter")
-			Timer(70,pc.vnc_control,["music","0","romance"]).start()
-			time = 0
-			mood = "romance" #I enter home late-night with company
+			mood = "romance" 
 			ap.set_status("digital","left_light",enter)
-			subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"1",str(1))],shell=True)
-			romance = 1
 			ap.set_status("digital","right_light",enter)
-		
-		elif (hour >= 16): #I enter home propably exhuaster from class/workout
+			lights(1,1)
+
+		elif (hour >= 16): #I enter home propably exhuasted from class/workout
 			ap.set_status("digital","left_light",enter)
-			subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"1",str(1))],shell=True)
-			time = "night"
-			mood = 0 
 			ap.set_status("digital","right_light",enter)
-		
-		
-		if (not romance):
-			Timer(70,pc.vnc_control,["music",time,mood]).start()
+			lights(1,1)
+			if hour >= 18:
+				time = "night"
+			
+
+
+		Timer(70,pc.vnc_control,["music",time,mood]).start()
 	
 	else: #enter = 0 <=> I am exiting the house
 		glo_inside = 0
 		webiopi.debug("leaving house")
 		ap.set_status("digital","left_light",enter)
 		ap.set_status("digital","right_light",enter)
-		subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"0",str(1))],shell=True)
 		ap.set_status("digital","tv-hifi",enter)
 		Timer(10,do.alert).start()
+		lights(1,0)
 
 @webiopi.macro
 def open_door(door):
@@ -140,9 +138,7 @@ def gday():
 	if pc.status() == 0:
 		ap.turn_on_pc()
 	#ap.set_status("digital","left_light",1)	
-	ret = subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"1",str(1))],shell=True)
-	if ret !=0:
-		webiopi.debug("can't call rc_send")
+	lights(1,1)
 	socket1_status = 1
 	#ap.set_status("digital","right_light",1)
 	inf.send("ADVANCE_ACOUSTIC","power",1)
@@ -157,9 +153,7 @@ def gnight():
 	ap.set_status("digital","left_light",0)
 	ap.set_status("digital","right_light",0)
 	ap.set_status("digital","tv-hifi",0)
-	ret = subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN),"0",str(1))],shell=True)
-	if ret !=0:
-		webiopi.debug("can't call rc_send")
+	lights(1,0)
 	socket1_status = 0
 
 
