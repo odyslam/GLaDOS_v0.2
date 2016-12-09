@@ -50,8 +50,8 @@ def music(time,mood): #uses spotify window
 
 def log_in(dummy1,dummy2):
 	#must wait 30-40 sec for pc to boot
-	for i in range(2):
-		client.keyPress('enter')
+	# for i in range(2):
+	client.keyPress('enter')
 	client.pause(1)
 	for i in "1556":
 		client.keyPress(i)
@@ -68,7 +68,7 @@ def turn_off(dummy1,dummy2):
 	client.mouseMove(1860,960)
 	client.mousePress(1)
 	client.pause(1)
-	client.keyPress('enter')
+	# client.keyPress('enter')
 	#Timer(5,turn_off,[0,0]).start()
 
 

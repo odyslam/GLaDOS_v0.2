@@ -1,13 +1,15 @@
 import httplib
 import os
-from threading import Timer
 import subprocess
+import logging
 
+
+# Script to be run by crontab every X minutes, probably ~5 is ideal.
 class SystemRestart():
 
-    def __init__(self,interval):
-        self.interval = interval
-        Timer(interval*60,self.system_check).start()
+    def __init__(self,logfile):
+        logging.basicConfig(filename= logfile,level=logging.INFO,format='%(asctime)s %(message)s')
+
 
     def have_internet(self):
         conn = httplib.HTTPConnection("www.google.com")
@@ -16,6 +18,8 @@ class SystemRestart():
             return True
         except:
             return False
+
+    # Add mail client, when something is offline, send warning mail to owner or better send fb message! 
 
 
     def site_online(self):
@@ -29,15 +33,19 @@ class SystemRestart():
 
     def system_check(self):
         if self.have_internet() == False:
+            logging.warning("No internet, rebooting Rooter")
             self.router_reboot() 
         elif self.site_online() == False:
-             os.system("sudo reboot")
+            logging.warning("Interface is Down, rebooting Raspberry")
+            os.system("sudo reboot")
         else:
-            Timer(self.interval*60,self.system_check).start()
+            logging.info("Everything are online, checking again in 5 min")
+
+
     def router_reboot(self):
-        subprocess.call("python /home/pi/glados_interface/python/router_restart.py",shell = True)
+        subprocess.call("python /home/pi/glados_interface/python/system_monitor/router_restart.py",shell = True)
         
 
-
 if __name__ == '__main__':
-    sr = SystemRestart(10)
+    sr = SystemRestart( "/home/pi/glados_interface/python/system_monitor/sys.log")
+    sr.system_check()

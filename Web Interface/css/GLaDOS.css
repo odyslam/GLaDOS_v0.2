@@ -83,7 +83,7 @@ th, td {
     height: 80px;
     margin-right:15px;
     width: 80px;
-
+    cursor: pointer;
     -moz-transition: all 2s linear;
     -webkit-transition: all 2s linear;
     transition: all 0.5s linear;
@@ -94,6 +94,7 @@ th, td {
     -moz-transform:rotate(360deg);
     -webkit-transform:rotate(360deg);
     transform:rotate(360deg);
+    cursor: pointer;
 }
 
 #day{
@@ -101,6 +102,7 @@ th, td {
     padding:auto auto;
     left:24%;
     bottom:120px;
+    cursor: pointer;
 }
 i + i {  /* add spaces between i */
     margin-left:40px;

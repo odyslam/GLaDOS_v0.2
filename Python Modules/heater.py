@@ -30,11 +30,13 @@ class Heater():
 		ret=call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" % (str(self.tran_pin),"0",str(self.socket_number))],shell=True)
 		if ret !=0:
 			webiopi.debug("can't call rc_send")
+		if self.heater_status == 1:
+			if self.heat_timer.is_alive():
+				webiopi.debug("Canceling Timer")
+				self.heat_timer.cancel()
+				webiopi.debug("TIMER IS NOW:")
+		
 		self.heater_status = 0
-		if self.heat_timer.is_alive():
-			webiopi.debug("Canceling Timer")
-			self.heat_timer.cancel()
-			webiopi.debug("TIMER IS NOW:")
 
 
 

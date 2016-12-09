@@ -58,7 +58,7 @@ def setup():
 	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
 	
 	do.up_door(0)
-	sysr = subprocess.Popen("sudo python /home/pi/glados_interface/python/system_restart.py",shell=True) # call subprocess
+	# sysr = subprocess.Popen("sudo python /home/pi/glados_interface/python/system_restart.py",shell=True) # call subprocess
 def destroy():
 	GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
 	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
@@ -78,13 +78,12 @@ def house(enter):
 		webiopi.debug("entering house") #i am entering the house
 		glo_inside = 1
 		do.down_door(1)
-		for i in range(2):
-			ap.set_status("digital","tv-hifi",enter)
+		ap.set_status("digital","tv-hifi",enter)
 		if pc.status() == 0:
 			ap.turn_on_pc() 
 		
 		Timer(5,inf.send,["ADVANCE_ACOUSTIC","power",1]).start()	
-		Timer(10,inf.send,["ADVANCE_ACOUSTIC","input_computer",1]).start()
+		Timer(12,inf.send,["ADVANCE_ACOUSTIC","input_computer",1]).start()
 		Timer(20,inf.send,["ADVANCE_ACOUSTIC","volume_up",10]).start()
 		Timer(45,pc.vnc_control,["log_in",0,0]).start()
 		lights(1,1)
@@ -97,14 +96,14 @@ def house(enter):
 		if (hour >= 22 or hour <= 7):
 			webiopi.debug("mpika romance enter")
 			mood = "romance" 
-			ap.set_status("digital","left_light",enter)
-			ap.set_status("digital","right_light",enter)
-			lights(1,1)
+			stat = ap.set_status("digital","left_light",enter)
+			if stat != "error":
+				ap.set_status("digital","right_light",enter)
 
-		elif (hour >= 16): #I enter home propably exhuasted from class/workout
-			ap.set_status("digital","left_light",enter)
-			ap.set_status("digital","right_light",enter)
-			lights(1,1)
+		elif (hour >= 14): #I enter home propably exhuasted from class/workout
+			stat = ap.set_status("digital","left_light",enter)
+			if stat != "error":
+				ap.set_status("digital","right_light",enter)
 			if hour >= 18:
 				time = "night"
 			
@@ -190,10 +189,11 @@ def lights(number,function): #function = 1 or 0, on/off
 		#rc2.send(function)
 	elif number == 3:
 		ret=ap.set_status("digital","left_light",function)
-		webiopi.debug("return value of function:%d is %d" %(function,ret))
+		webiopi.debug("return value of function:%d is %s" %(function,str(ret)))
 	elif number == 4:
 		ret=ap.set_status("digital","right_light",function)
-		webiopi.debug("return value of function:%d is %d" %(function,ret))
+		webiopi.debug("return value of function:%d is %s" %(function,str(ret)))
+
 @webiopi.macro
 def status_test():
 	dicta = {"a":1,"b":2}

@@ -35,7 +35,7 @@ class Api():
 			return 1 - int(answer["return_value"]) #invert logic
 		except:
 			webiopi.debug("connection error with get_ status")
-			return 0  #json data is string, "1"--> int 1 --> true/false
+			return "error"  #json data is string, "1"--> int 1 --> true/false
 	
 	def set_status(self,function,pin,status):
 		function = str(function)
@@ -50,14 +50,13 @@ class Api():
 			pin = TV_HIFI_PIN
 		elif pin == "right_light":
 			pin = RIGHT_LIGHT_PIN
-		try:
-			for i in range(2):
-				resp = requests.get(self.address + "/" + function + "/" + pin + "/" + status,timeout=0.01)
-				answer = resp.json()
-			return int(answer["return_value"])
-		except:
-			webiopi.debug("connection error with set_status")
-			return 0
+		try:	
+			resp = requests.get(self.address + "/" + function + "/" + pin + "/" + status,timeout=0.03)
+			return int(status)
+		
+		except requests.exceptions.RequestException as e:
+			webiopi.debug("Requests error:  %s" %str(e))
+			return "error"
 
 	def turn_on_pc(self):
 		try:
