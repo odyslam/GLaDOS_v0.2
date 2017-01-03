@@ -160,6 +160,6 @@ class GladosBot(fbchat.Client):
         print hifi
             
 
-bot = GladosBot("odyslam@icloud.com","glados007")
+bot = GladosBot("XXXXXXXX","XXXXXXX")
 bot.wit_start("767CDEYBYRJPEXKHCO67LJPCFTKXKVQP")
 bot.listen()
