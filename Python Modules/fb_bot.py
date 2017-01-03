@@ -161,5 +161,5 @@ class GladosBot(fbchat.Client):
             
 
 bot = GladosBot("XXXXXXXX","XXXXXXX")
-bot.wit_start("767CDEYBYRJPEXKHCO67LJPCFTKXKVQP")
+bot.wit_start("XXXXXXXXX")
 bot.listen()
