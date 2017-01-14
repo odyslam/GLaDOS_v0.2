@@ -15,7 +15,6 @@ def music(time,mood): #uses spotify window
 	elif time == "night":
 		music.append("spotify:user:spotify:playlist:2clF8IuETuB6DzmQn7I4RM")
 		music.append("spotify:user:spotify:playlist:3J3mTk0N0NzDOFgnp67Z75")
-		music.append("spotify:user:11141301673:playlist:6xfhIWSeRW24HJfHvWaiGM")
 	if mood == "romance":
 		music = ["spotify:user:11141301673:playlist:6xfhIWSeRW24HJfHvWaiGM"]
 	

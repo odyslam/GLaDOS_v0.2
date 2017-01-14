@@ -3,7 +3,8 @@ import webiopi
 
 LEFT_LIGHT_PIN = "13"
 RIGHT_LIGHT_PIN = "12"
-TV_HIFI_PIN = "4"
+HIFI_PIN = "4"
+TV_PIN = "14"
 
 
 class Api():
@@ -20,15 +21,20 @@ class Api():
 
 	def get_status(self,function,pin):
 		function = str(function) 
+		pin2 = None
 		if pin == "left_light":
 			pin = LEFT_LIGHT_PIN
 		elif pin == "tv-hifi":
-			pin = TV_HIFI_PIN
+			pin = HIFI_PIN
+			pin2 = TV_PIN
 		elif pin == "right_light":
 			pin = RIGHT_LIGHT_PIN
-		pin = str(pin)
 		try:
 			resp = requests.get(self.address + "/" + function + "/" + pin,timeout=0.07)
+			if resp.status_code !=200:
+				webiopi.debug("can't get status from api") 
+			if pin2:
+				resp = requests.get(self.address + "/" + function + "/" + pin2,timeout=0.07)
 			if resp.status_code !=200:
 				webiopi.debug("can't get status from api")
 			answer = resp.json()
@@ -43,15 +49,18 @@ class Api():
 		status = 1 - status #invert logic
 		status = str(status)
 		webiopi.debug("set status is :"+status)
-
+		pin2 = None
 		if pin == "left_light":
 			pin = LEFT_LIGHT_PIN
 		elif pin == "tv-hifi":
-			pin = TV_HIFI_PIN
+			pin = HIFI_PIN
+			pin2 = TV_PIN
 		elif pin == "right_light":
 			pin = RIGHT_LIGHT_PIN
 		try:	
 			resp = requests.get(self.address + "/" + function + "/" + pin + "/" + status,timeout=0.03)
+			if pin2:
+				resp = requests.get(self.address + "/" + function + "/" + pin2 + "/" + status,timeout=0.03)
 			return int(status)
 		
 		except requests.exceptions.RequestException as e:

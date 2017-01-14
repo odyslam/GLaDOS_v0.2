@@ -56,9 +56,9 @@ def setup():
 	GPIO.setFunction(DOOR_STATUS_PIN, GPIO.IN,GPIO.PUD_DOWN)	
 	GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
 	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
-	
+	fb_bot = subprocess.Popen("python /home/pi/glados_interface/bot/fb_bot.py",shell = True) # start bot 
+	# system_monitor.py is run by crontab every X min, now X = 5 , change to 10 maybe?
 	do.up_door(0)
-	# sysr = subprocess.Popen("sudo python /home/pi/glados_interface/python/system_restart.py",shell=True) # call subprocess
 def destroy():
 	GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
 	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
@@ -195,12 +195,24 @@ def lights(number,function): #function = 1 or 0, on/off
 		webiopi.debug("return value of function:%d is %s" %(function,str(ret)))
 
 @webiopi.macro
-def status_test():
-	dicta = {"a":1,"b":2}
-	return json.dumps(dicta,separators=(',',':'))
+def status():
+	global glo_inside
+	do.inside = glo_inside
+
+	status_dict = {}
+	status_dict['l_light'] = ap.get_status("digital","left_light")
+	status_dict['r_light'] = ap.get_status("digital","right_light")
+	status_dict['el_time'] = he.elapsed_time()
+	status_dict['o_light'] = socket1_status
+	webiopi.debug("elapsed time:%s" % he.elapsed_time)
+	status_dict['he_status'] = he.heater_status
+	status_dict['pc_status'] = pc.status()
+	status_dict['inside'] = do.inside
+
+	return json.dumps(status_dict,separators=(',',':'))
 	
 @webiopi.macro
-def status():
+def status_test():
 	global glo_inside
 	do.inside = glo_inside
 	a = ap.get_status("digital","left_light")
@@ -224,5 +236,17 @@ def desktop_pc(function):
 	if function == "status": #status = 1/0
 		status = pc.status()
 		return  json.dumps ([status])
+
+@webiopi.macro
+def hifi(function,args=None):
+	args = int(args)
+	if function == "power":
+		inf.send("ADVANCE_ACOUSTIC","power",1)
+	elif function == "volume_up":
+		inf.send("ADVANCE_ACOUSTIC","volume_up",args)
+	elif function == "volume_down":
+		inf.send("ADVANCE_ACOUSTIC","volume_down",args)
+	elif function == "computer":
+		inf.send("ADVANCE_ACOUSTIC","input_computer")
 
 

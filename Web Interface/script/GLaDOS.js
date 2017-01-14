@@ -14,12 +14,24 @@ function get_status(){
 function get_status_test(){
     webiopi().callMacro("status_test",[],store_status_test);}
 
-function store_status_test(macro,args,data){
+function store_status(macro,args,data){
     console.log(data);
-    data = JSON.parse(data)
-    console.log(data['a']);
+    status_dict = JSON.parse(data);
+    console.log(status_dict)
+    o_light_status = status_dict['o_light'];
+    r_light_status = status_dict['r_light'];
+    l_light_status = status_dict['l_light'];
+    inside = status_dict['inside'];
+    heater_status = status_dict['he_status'];
+    el_time = status_dict['el_time']
+    pc_status = ['pc_status']
+    
+    set_status();
+    countdown_clock(el_time);
+    console.log("el_time"+ el_time);
+
 }
-function store_status(macro,args,data) {
+function store_status_test(macro,args,data) {
     console.log("data:"+ data)
      o_light_status = parseInt(data[1]);
      pc_status = parseInt(data[9]);
