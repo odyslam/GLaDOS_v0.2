@@ -31,22 +31,8 @@ function store_status(macro,args,data){
     console.log("el_time"+ el_time);
 
 }
-function store_status_test(macro,args,data) {
-    console.log("data:"+ data)
-     o_light_status = parseInt(data[1]);
-     pc_status = parseInt(data[9]);
-     l_light_status = parseInt(data[5]);
-     r_light_status = parseInt(data[7]);
-     inside = parseInt(data[11]);
-     heater_status = parseInt(data[13]);
-     time_str = data.substring(15, 20);
-     el_time = parseInt(time_str);
-     set_status();
-     console.log("el_time"+ el_time)
-     countdown_clock(el_time)
- }
-function set_status(){
 
+function set_status(){
     document.getElementById("myonoffswitch").checked = pc_status;
     document.getElementById("myonoffswitch1").checked = l_light_status;
     document.getElementById("myonoffswitch2").checked = r_light_status;
@@ -75,11 +61,14 @@ function doors(door){
 
 }
 function time_day(gday){
-    if(gday == 1){
-        webiopi().callMacro("gday");
-    }
-    else {
-        webiopi().callMacro("gnight");
+    var i = confirm ("Morning Routine,please confirm")
+    if(i==true){
+        if(gday == 1){
+            webiopi().callMacro("gday");
+        }
+        else {
+            webiopi().callMacro("gnight");
+        }
     }
 }
 

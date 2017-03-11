@@ -1,6 +1,5 @@
 # from vncdotool import api
 import os
-import sys
 import subprocess
 
 class Pc():

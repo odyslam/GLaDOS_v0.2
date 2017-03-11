@@ -1,31 +1,28 @@
 from vncdotool import api
 import sys
 import random
+import json
 #from threading import Timer
 
 
 
 def music(time,mood): #uses spotify window
-	music = []
+	with open('/home/pi/glados_interface/python/music.json') as data_file:    
+		music_all = json.load(data_file)
+		music = []
 	if time == "morning":
-		music.append("spotify:user:spotify:playlist:7EtGvEVYkL6knEdLxNjHf3")
-		music.append("spotify:user:spotify:playlist:3J3mTk0N0NzDOFgnp67Z75")
-		music.append("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C") #electropose
-
+		music.extend(music_all["morning"])
 	elif time == "night":
-		music.append("spotify:user:spotify:playlist:2clF8IuETuB6DzmQn7I4RM")
-		music.append("spotify:user:spotify:playlist:3J3mTk0N0NzDOFgnp67Z75")
+		music.extend(music_all["night"])
 	if mood == "romance":
-		music = ["spotify:user:11141301673:playlist:6xfhIWSeRW24HJfHvWaiGM"]
-	
+		music.extend(music_all["romance"])
 	elif mood == "chill":
-		music.append("spotify:user:11141301673:playlist:58x34vXnrK8YQQAvkqpqRB")
-		music.append("spotify:user:11141301673:playlist:6eboyL7VOwgbYxHhbFD34u")
-		music.append("spotify:user:spotify:playlist:3J3mTk0N0NzDOFgnp67Z75")
-		music.append("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C")
-		music.append("spotify:user:electropos%C3%A9:playlist:6nZaTh6K1SwhdELFTmA99C") #electropose #netflix&chill
+		music.extend(music_all["chill"])
 
 	playlist = random.sample(music,1).pop()
+	for i in range(len(music)):
+		print music[i]
+	print(playlist)
 
 	client.mouseMove(320,1050)
 	client.pause(3)

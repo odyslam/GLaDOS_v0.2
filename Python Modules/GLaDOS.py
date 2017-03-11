@@ -1,3 +1,6 @@
+### Last edit 10/3
+
+
 import webiopi
 import time
 from threading import Timer
@@ -9,7 +12,8 @@ import infrared
 import pc_control
 import heater
 import subprocess 
-
+import os
+import signal
 from datetime import datetime
 import json
 
@@ -56,14 +60,15 @@ def setup():
 	GPIO.setFunction(DOOR_STATUS_PIN, GPIO.IN,GPIO.PUD_DOWN)	
 	GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
 	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
-	fb_bot = subprocess.Popen("python /home/pi/glados_interface/bot/fb_bot.py",shell = True) # start bot 
-	# system_monitor.py is run by crontab every X min, now X = 5 , change to 10 maybe?
-	do.up_door(0)
-def destroy():
+	fb_bot = subprocess.Popen("python /home/pi/glados_interface/bot/fb_bot.py", stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid) # start bot 
+	# system_monitor.py is run by crontab every X min, now X = 5. Resets log_file every day @12pm
+	do.up_door(0) #lock up_door
+def destroy(): 
 	GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
 	GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
-	do.up_door(0)
-	he.turn_off()
+	do.up_door(0) #lock up_door
+	he.turn_off() #turn_off boiler
+	os.killpg(os.getpgid(fb_bot.pid), signal.SIGTERM) #kill fb_bot
 
 
  #~~~~~~~~~~~~~~~~MACROS MACROS MACROS MACROS MACROS MACROS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -80,46 +85,36 @@ def house(enter):
 		do.down_door(1)
 		ap.set_status("digital","tv-hifi",enter)
 		if pc.status() == 0:
-			ap.turn_on_pc() 
-		
-		Timer(5,inf.send,["ADVANCE_ACOUSTIC","power",1]).start()	
-		Timer(12,inf.send,["ADVANCE_ACOUSTIC","input_computer",1]).start()
-		Timer(20,inf.send,["ADVANCE_ACOUSTIC","volume_up",10]).start()
-		Timer(45,pc.vnc_control,["log_in",0,0]).start()
+			ap.turn_on_pc() 	
+		inf.send("ADVANCE_ACOUSTIC","power",1)
+		inf.send("ADVANCE_ACOUSTIC","input_computer",1) #next command after power doesn't work,reason uknown 	
+		Timer(35,inf.send,["ADVANCE_ACOUSTIC","input_computer",1]).start()
+		Timer(23,inf.send,["ADVANCE_ACOUSTIC","volume_up",10]).start()
 		lights(1,1)
-		
-
 		mood = "chill"
 		time = 0
 		hour = int(datetime.now().time().hour )
-		
 		if (hour >= 22 or hour <= 7):
 			webiopi.debug("mpika romance enter")
 			mood = "romance" 
 			stat = ap.set_status("digital","left_light",enter)
 			if stat != "error":
 				ap.set_status("digital","right_light",enter)
-
 		elif (hour >= 14): #I enter home propably exhuasted from class/workout
 			stat = ap.set_status("digital","left_light",enter)
 			if stat != "error":
 				ap.set_status("digital","right_light",enter)
 			if hour >= 18:
 				time = "night"
-			
-
-
 		Timer(70,pc.vnc_control,["music",time,mood]).start()
-	
 	else: #enter = 0 <=> I am exiting the house
 		glo_inside = 0
 		webiopi.debug("leaving house")
 		ap.set_status("digital","left_light",enter)
 		ap.set_status("digital","right_light",enter)
 		ap.set_status("digital","tv-hifi",enter)
-		Timer(10,do.alert).start()
-		lights(1,0)
-
+		#Timer(10,do.alert).start()
+		lights(1,0) #turn_off office lights
 @webiopi.macro
 def open_door(door):
 	door = int(door)
@@ -129,23 +124,18 @@ def open_door(door):
 	elif door == 2:
 		do.down_door(1)
 		do.up_door(1)
-
 @webiopi.macro
 def gday():
-	global socket1_status
 	ap.set_status("digital","tv-hifi",1)
 	if pc.status() == 0:
-		ap.turn_on_pc()
-	#ap.set_status("digital","left_light",1)	
-	lights(1,1)
-	socket1_status = 1
-	#ap.set_status("digital","right_light",1)
+		ap.turn_on_pc()	
+	lights(1,1) #turn_on office lights
 	inf.send("ADVANCE_ACOUSTIC","power",1)
-	Timer(10,inf.send,["ADVANCE_ACOUSTIC","input_computer",1]).start()
+	inf.send("ADVANCE_ACOUSTIC","input_computer",1) #next command after power doesn't work,reason uknown 
+	Timer(10,inf.send,["ADVANCE_ACOUSTIC","input_computer",2]).start()
 	Timer(20,inf.send,["ADVANCE_ACOUSTIC","volume_up",8]).start()
 	Timer(40,pc.vnc_control,["log_in",0,0]).start()
-	Timer(60,pc.vnc_control,["music","morning","chill"]).start()
-
+	Timer(60,pc.vnc_control,["music","morning","chill"]).start()	
 @webiopi.macro
 def gnight():
 	global socket1_status
@@ -154,9 +144,6 @@ def gnight():
 	ap.set_status("digital","tv-hifi",0)
 	lights(1,0)
 	socket1_status = 0
-
-
-
 @webiopi.macro
 def heater(mode,time):
 	mode = int(mode)
@@ -169,8 +156,6 @@ def heater(mode,time):
 	elif mode == 0:
 		webiopi.debug("heater stop")
 		he.turn_off()
-
-
 @webiopi.macro
 def lights(number,function): #function = 1 or 0, on/off
 	global socket1_status,socket2_status
@@ -198,7 +183,6 @@ def lights(number,function): #function = 1 or 0, on/off
 def status():
 	global glo_inside
 	do.inside = glo_inside
-
 	status_dict = {}
 	status_dict['l_light'] = ap.get_status("digital","left_light")
 	status_dict['r_light'] = ap.get_status("digital","right_light")
@@ -208,23 +192,8 @@ def status():
 	status_dict['he_status'] = he.heater_status
 	status_dict['pc_status'] = pc.status()
 	status_dict['inside'] = do.inside
-
 	return json.dumps(status_dict,separators=(',',':'))
 	
-@webiopi.macro
-def status_test():
-	global glo_inside
-	do.inside = glo_inside
-	a = ap.get_status("digital","left_light")
-	b = ap.get_status("digital","right_light")
-	el_time = he.elapsed_time()
-	webiopi.debug("elapsed time:%s" % el_time)
-	he_stat = he.heater_status
-	c = pc.status()
-	
-	#socket1 socket2 left_light right_light pc inside heater elapsed_time
-	
-	return json.dumps([socket1_status,socket2_status,a,b,c,glo_inside,he_stat,el_time], separators=(',',':'))
 @webiopi.macro
 def desktop_pc(function):
 	function = int(function)
@@ -232,10 +201,6 @@ def desktop_pc(function):
 		pc.vnc_control("turn_off",0,0)
 	if function == 1:
 		ap.turn_on_pc()
-
-	if function == "status": #status = 1/0
-		status = pc.status()
-		return  json.dumps ([status])
 
 @webiopi.macro
 def hifi(function,args=None):

@@ -58,9 +58,9 @@ class Api():
 		elif pin == "right_light":
 			pin = RIGHT_LIGHT_PIN
 		try:	
-			resp = requests.get(self.address + "/" + function + "/" + pin + "/" + status,timeout=0.03)
+			resp = requests.get(self.address + "/" + function + "/" + pin + "/" + status,timeout=0.4)
 			if pin2:
-				resp = requests.get(self.address + "/" + function + "/" + pin2 + "/" + status,timeout=0.03)
+				resp = requests.get(self.address + "/" + function + "/" + pin2 + "/" + status,timeout=0.4)
 			return int(status)
 		
 		except requests.exceptions.RequestException as e:
