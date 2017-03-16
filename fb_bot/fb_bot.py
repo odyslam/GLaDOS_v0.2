@@ -9,7 +9,7 @@ import fbchat
 import requests
 from wit import Wit
 
-
+# add logger, divide modules to wit engine/caller and fbchat.
 class GladosBot(fbchat.Client):
     def __init__(self, email, password, debug=False, user_agent=None,log = False):
         fbchat.Client.__init__(self, email, password, debug, user_agent)
@@ -20,7 +20,7 @@ class GladosBot(fbchat.Client):
         self.log = log
         self.authorised_id = {}
         self.authorised_idrev = {}
-        self.ip_address = "XYXYXYXYXYXYXYXY"
+        self.ip_address = "http://odys:defiler007@192.168.1.19:8000"
         self.authorised_update()
         self.send(self.authorised_id["odysseas lamtzidis"], "ETOIMOS")
         if log:
@@ -173,11 +173,14 @@ class GladosBot(fbchat.Client):
         self.context[door] = True
 
         if door == "doors":
-            self.macro_call("house", [1])
+            self.macro_call("open_door", [2])
             self.context['2doors'] = True
         elif door == "door":
             self.macro_call("open_door", [1])
             self.context['1door'] = True
+        elif door == "enter_house":
+            self.macro_call("house", [1])
+            self.context['2doors'] = True
         else:
             self.context['uncertain'] = True
         print (self.context)
@@ -316,7 +319,8 @@ class GladosBot(fbchat.Client):
                     #    self.context['s_positive'] = True
                     # else:
                     #   self.context['s_negative'] = True
-
+        if not 'action' in self.context:
+        	self.context['action'] = False
 
         if hifi == "volume" or (self.context['action'] in ["increase","decrease"]): 
             if action:
@@ -341,7 +345,7 @@ class GladosBot(fbchat.Client):
                 self.context['switch'] = "Ανοίγω"
             elif action == "close":
                 self.context['switch'] = "Κλείνω"
-            self.macro_call("hifi", ["power"])
+            self.macro_call("hifi", ["power",1])
 
         if self.context.get('uncertain') is not None:
             del self.context['uncertain']
@@ -386,10 +390,10 @@ class GladosBot(fbchat.Client):
 if __name__ == '__main__': #change listen() so it returns 0 when an error occurs
     online = False
     while not online:
+        bot = GladosBot ("odyslam@icloud.com", "glados007",log = False) #if the bot times-Out of fb, make a new session
+        print ("error in starting bot,retrying.......")
+        bot.wit_start("767CDEYBYRJPEXKHCO67LJPCFTKXKVQP")
         try:
-            bot = GladosBot ("XXXXXXXX", "YYYYYYYYY",log = False) #if the bot times-Out of fb, make a new session
+            online = bot.listen()
         except:
-            print ("error in starting bot,retrying.......")
             continue
-        bot.wit_start("XYXYXYXYXYXYXYXY")
-        online = bot.listen()

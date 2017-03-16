@@ -22,8 +22,6 @@ def music(time,mood): #uses spotify window
 	playlist = random.sample(music,1).pop()
 	for i in range(len(music)):
 		print music[i]
-	print(playlist)
-
 	client.mouseMove(320,1050)
 	client.pause(3)
 	client.mousePress(1)
@@ -37,7 +35,7 @@ def music(time,mood): #uses spotify window
 	client.pause(0.5)
 	client.keyPress('enter')
 	client.pause(2.5)
-	client.mouseMove(500,300)
+	client.mouseMove(520,320)
 	client.pause(1)
 	client.mousePress(1)
 	for i in range(2): 
@@ -64,19 +62,6 @@ def turn_off(dummy1,dummy2):
 	client.mouseMove(1860,960)
 	client.mousePress(1)
 	client.pause(1)
-	# client.keyPress('enter')
-	#Timer(5,turn_off,[0,0]).start()
-
-
-	#client.mouseMove(20,1060)
-	#client.mousePress(1)
-	#client.pause(0.5)
-	#client.mouseMove(20,980)
-	#client.mousePress(1)
-	#client.pause(0.5)
-	#client.mouseMove(100,910)
-	#client.mousePress(1)
-
 
 
 if __name__ == '__main__':

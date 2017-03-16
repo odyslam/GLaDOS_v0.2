@@ -42,7 +42,7 @@ class SystemRestart():
         elif self.site_online() == False:
             logging.warning("Interface is Down, rebooting Raspberry")
             os.system("sudo reboot")
-        elif:
+        else:
             logging.info("Everything are online, checking again in 5 min")
 
 

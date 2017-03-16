@@ -1,19 +1,16 @@
 var pc_status,l_light_status,r_light_status,o_light_status,heater_status,inside,el_time;
 
-webiopi().ready(function() {
+$( document ).ready(function() {
+    console.log( "ready!" );
     console.log("ksekinisa");
-    w().refreshGPIO(true);
     $(".door_icons").click(function(){
     $(this).toggleClass("down");})
     get_status();
+
+
 });
-
 function get_status(){
-     webiopi().callMacro("status",[],store_status);}
-
-function get_status_test(){
-    webiopi().callMacro("status_test",[],store_status_test);}
-
+     call_macro("status",[],store_status);}
 function store_status(macro,args,data){
     console.log(data);
     status_dict = JSON.parse(data);
@@ -25,7 +22,6 @@ function store_status(macro,args,data){
     heater_status = status_dict['he_status'];
     el_time = status_dict['el_time']
     pc_status = ['pc_status']
-    
     set_status();
     countdown_clock(el_time);
     console.log("el_time"+ el_time);
@@ -42,7 +38,7 @@ function set_status(){
  function house(enter){
     var i = confirm ("Oppening Doors, please confirm")
     if (i==true){
-        webiopi().callMacro("house",[enter]);
+        call_macro("house",[enter]);
     }
     else{
         location.reload();
@@ -53,7 +49,7 @@ function set_status(){
 function doors(door){
     var i = confirm ("Oppening Doors, please confirm")
     if (i==true){
-        webiopi().callMacro("open_door",[door]);
+        call_macro("open_door",[door]);
     }
     else{
         location.reload();
@@ -64,20 +60,21 @@ function time_day(gday){
     var i = confirm ("Morning Routine,please confirm")
     if(i==true){
         if(gday == 1){
-            webiopi().callMacro("gday");
+            call_macro("gday");
         }
         else {
-            webiopi().callMacro("gnight");
+            call_macro("gnight");
         }
     }
+    set_status();
 }
 
 function pc() {
      if (pc_status == 1) {
-         webiopi().callMacro("desktop_pc", [0]);
+         call_macro("desktop_pc", [0]);
      }
      else {
-         webiopi().callMacro("desktop_pc", [1]);
+         call_macro("desktop_pc", [1]);
      }
  }
 function light(l_group_status,number){
@@ -94,14 +91,13 @@ function light(l_group_status,number){
             o_light_status = mode;
             break;
         }
-
-    webiopi().callMacro("lights",[number,mode]);}
+    call_macro("lights",[number,mode]);}
 
 function heater(time){
     time = time * 60; /* convert min to sec */
     var mode = 1 - heater_status;
     console.log("mode "+ mode) ;/* will switch between 1 and 0, if status = 0 (off) mode = 1 so it turns it on */
-    webiopi().callMacro("heater",[mode,time]);
+    call_macro("heater",[mode,time]);
         if (mode == 1){
             countdown_clock(time);
             console.log("clock started for: " +time)
@@ -116,8 +112,6 @@ function heater_ctime(){
     var heat_time = document.getElementById("time");
     heater(heat_time.value);
 }
-
-
 function countdown_clock(seconds){
     var clock;
     clock = new FlipClock($('.clock'), seconds, {
@@ -127,11 +121,30 @@ function countdown_clock(seconds){
     });
 }
 
-
 function test_door(){
     var intervalID = window.setInterval(pin_return, 500);
     
 }
 function pin_return(){
-    console.log(webiopi().digitalRead(22))
+    console.log(digital_read(22))
+}
+call_macro = function (macro, args, callback) {
+	if (args == undefined) {
+		args = "";
+	}
+	$.post(w().context + 'macros/' + macro + "/" + args, function(data) {
+		if (callback != undefined) {
+			callback(macro, args, data);
+		}
+	});
+}
+
+digital_read = function (gpio, callback) {
+	if (callback != undefined) {
+		$.get(w().context + 'GPIO/' + gpio + "/value", function(data) {
+			w().updateValue(gpio, data);
+			callback(gpio, data);
+		});
+	}
+	return w().GPIO[gpio].value;
 }
