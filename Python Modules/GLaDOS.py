@@ -31,8 +31,10 @@ SERVO_STATUS_PIN = 5
 OUTDOOR_PIN = 23
 TRANSMITTER_PIN = 1 # GPIO.1 = pin 18
 DOOR_STATUS_PIN = 22
-INFRARED_PIN = 25 #just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
-#GLobal Instances
+INFRARED_PIN = 25 
+#just for reference, we set-up the pin while installing lirc (both for transmitter and receiver)
+
+# GLobal Instances
 
 do = door.Doors(SERVO_PIN, OUTDOOR_PIN, DOOR_STATUS_PIN, SERVO_STATUS_PIN)
 ap = esp.Api(ESP8266_ADDRESS)
@@ -40,13 +42,17 @@ inf = infrared.Infrared(INFRARED_PIN)
 pc = pc_control.Pc(PC_ADDRESS)
 he = heater.Heater(HEATER_SOCKET, TRANSMITTER_PIN)
 fb_bot = subprocess.Popen("python /home/pi/glados_interface/bot/fb_bot.py", stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid) # start bot
+# system_monitor.py is run by crontab every X min, now X = 5. 
+# Resets log_file every day @12pm
 
-#global variables for sockets
+#global variables for sockets and if someone is inside
 
 socket1_status = 0
 socket2_status = 0
 glo_inside = 0
 
+# setup my GPIOs and their usage
+# setup is invoked @start of webiopi servce
 def setup():
     webiopi.debug("Setup")
     GPIO.setFunction(SERVO_STATUS_PIN, GPIO.IN)
@@ -56,8 +62,9 @@ def setup():
     GPIO.setFunction(DOOR_STATUS_PIN, GPIO.IN, GPIO.PUD_DOWN)
     GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
     GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
-    # system_monitor.py is run by crontab every X min, now X = 5. Resets log_file every day @12pm
     do.up_door(0) #lock up_door
+
+#destroy is invoked @exit of webiopi service
 def destroy(): 
     GPIO.digitalWrite(OUTDOOR_PIN, GPIO.LOW)
     GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
@@ -70,7 +77,7 @@ def house(enter):
     global glo_inside
     enter = int(enter)
     do.up_door(1)
-    lights(1,enter) #office_lights
+    lights(1, enter) #office_lights
     if enter == 1:
         glo_inside = 1
         mood = "chill"
@@ -82,7 +89,7 @@ def house(enter):
         Timer(45, pc.vnc_control, ["log_in", 0, 0]).start()
         inf.send("ADVANCE_ACOUSTIC", "power", 1)
         #next command after power doesn't work,reason uknown
-        inf.send("ADVANCE_ACOUSTIC", "input_computer", 1) 
+        inf.send("ADVANCE_ACOUSTIC", "input_computer", 1)
         Timer(15, inf.send, ["ADVANCE_ACOUSTIC", "input_computer", 1]).start()
         Timer(25, inf.send, ["ADVANCE_ACOUSTIC", "volume_up", 10]).start()
         hour = int(datetime.now().time().hour)
@@ -104,16 +111,15 @@ def house(enter):
         lights(4, enter) #righ_light
         ap.set_status("digital", "tv-hifi", enter)
 @webiopi.macro
-def open_door(door_number):
+def open_door(door_number): #control appertment's/building's door
     door_number = int(door_number)
     if door_number == 1:
-        webiopi.debug("mpika open_door")
         do.up_door(1)
     elif door_number == 2:
         do.down_door(1)
         do.up_door(1)
 @webiopi.macro
-def gday():
+def gday(): #Morning Routine
     ap.set_status("digital", "tv-hifi", 1)
     if pc.status() == 0:
         ap.turn_on_pc()
@@ -126,13 +132,13 @@ def gday():
     Timer(40, pc.vnc_control, ["log_in", 0, 0]).start()
     Timer(60, pc.vnc_control, ["music", "morning", "chill"]).start()
 @webiopi.macro
-def gnight():
+def gnight(): #Night-Routine
     lights(1, 0) #office_light
     lights(3, 0) #left_light
     lights(4, 0) #righ_light
     ap.set_status("digital", "tv-hifi", 0)
 @webiopi.macro
-def heater(mode, time):
+def heater(mode, time): #control boiler
     mode = int(mode)
     time = int(time)
     if mode == 1:
@@ -143,7 +149,7 @@ def heater(mode, time):
         webiopi.debug("heater stop")
         he.turn_off()
 @webiopi.macro
-def lights(number, function): #function = 1 or 0, on/off
+def lights(number, function): #function = 1/0 ==> on/off
     global socket1_status,socket2_status
     number = int(number)
     function = int(function)
@@ -185,7 +191,7 @@ def desktop_pc(function):
     if function == 1:
         ap.turn_on_pc()
 @webiopi.macro
-def hifi(function, args=None):
+def hifi(function, args=None): #control the hifi system via inf/red led, LIRC library
     args = int(args)
     if function == "power":
         inf.send("ADVANCE_ACOUSTIC", "power", 1)

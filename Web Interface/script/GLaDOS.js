@@ -1,18 +1,13 @@
-var pc_status,l_light_status,r_light_status,o_light_status,heater_status,inside,el_time;
+var pc_status, l_light_status, r_light_status, o_light_status, heater_status, inside, el_time;
 
 $( document ).ready(function() {
     console.log( "ready!" );
-    console.log("ksekinisa");
-    $(".door_icons").click(function(){
-    $(this).toggleClass("down");})
     get_status();
-
-
 });
 function get_status(){
-     call_macro("status",[],store_status);}
+     call_macro("status",[],store_status);
+}
 function store_status(macro,args,data){
-    console.log(data);
     status_dict = JSON.parse(data);
     console.log(status_dict)
     o_light_status = status_dict['o_light'];
@@ -20,14 +15,11 @@ function store_status(macro,args,data){
     l_light_status = status_dict['l_light'];
     inside = status_dict['inside'];
     heater_status = status_dict['he_status'];
-    el_time = status_dict['el_time']
-    pc_status = ['pc_status']
+    el_time = status_dict['el_time'];
+    pc_status = status_dict['pc_status'];
     set_status();
     countdown_clock(el_time);
-    console.log("el_time"+ el_time);
-
 }
-
 function set_status(){
     document.getElementById("myonoffswitch").checked = pc_status;
     document.getElementById("myonoffswitch1").checked = l_light_status;
@@ -36,39 +28,31 @@ function set_status(){
     document.getElementById("myonoffswitch4").checked = heater_status;
     document.getElementById("myonoffswitch5").checked = heater_status;}
  function house(enter){
-    var i = confirm ("Oppening Doors, please confirm")
-    if (i==true){
+    var i = confirm ("Enter/Leave House Routine, please confirm")
+    if (i == true){
         call_macro("house",[enter]);
-    }
-    else{
-        location.reload();
-    }
-     
+        get_status();
+    }    
  }
-
 function doors(door){
-    var i = confirm ("Oppening Doors, please confirm")
-    if (i==true){
+    var i = confirm ("Oppening Doors Routine, please confirm")
+    if (i == true){
         call_macro("open_door",[door]);
+        $(".door_icons").toggleClass("down");
     }
-    else{
-        location.reload();
-    }
-
 }
 function time_day(gday){
-    var i = confirm ("Morning Routine,please confirm")
-    if(i==true){
+    var i = confirm ("Morning/Night Routine,please confirm")
+    if(i == true){
         if(gday == 1){
             call_macro("gday");
         }
         else {
             call_macro("gnight");
         }
+    get_status();
     }
-    set_status();
 }
-
 function pc() {
      if (pc_status == 1) {
          call_macro("desktop_pc", [0]);
@@ -90,9 +74,9 @@ function light(l_group_status,number){
         case 2:
             o_light_status = mode;
             break;
-        }
-    call_macro("lights",[number,mode]);}
-
+    }
+    call_macro("lights",[number,mode]);
+}
 function heater(time){
     time = time * 60; /* convert min to sec */
     var mode = 1 - heater_status;
@@ -120,31 +104,27 @@ function countdown_clock(seconds){
         countdown: true
     });
 }
-
 function test_door(){
-    var intervalID = window.setInterval(pin_return, 500);
-    
+    var intervalID = window.setInterval(pin_return, 500); 
 }
 function pin_return(){
-    console.log(digital_read(22))
+    digital_read(22,console.log)
 }
 call_macro = function (macro, args, callback) {
 	if (args == undefined) {
 		args = "";
 	}
-	$.post(w().context + 'macros/' + macro + "/" + args, function(data) {
+	$.post('/macros/' + macro + "/" + args, function(data) {
 		if (callback != undefined) {
 			callback(macro, args, data);
 		}
 	});
 }
-
 digital_read = function (gpio, callback) {
 	if (callback != undefined) {
-		$.get(w().context + 'GPIO/' + gpio + "/value", function(data) {
-			w().updateValue(gpio, data);
-			callback(gpio, data);
+		$.get('/GPIO/' + gpio + "/value", function(data) {
+			callback(data);  //use postman to see what it returns and replace the return w() with something simplers
 		});
 	}
-	return w().GPIO[gpio].value;
+	
 }

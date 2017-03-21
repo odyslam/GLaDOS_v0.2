@@ -10,8 +10,6 @@ class Heater():
 		self.socket_number = socket_number
 		self.tran_pin = tran_pin
 		#self.rc = rc_switch.Rcswitch(socket_number,tran_pin)
-
-
 	def turn_on(self,runtime): #time in seconds
 		runtime = float(runtime)
 		self.runtime = runtime
@@ -22,7 +20,6 @@ class Heater():
 		ret=call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" % (str(self.tran_pin),"1",str(self.socket_number))],shell=True)
 		if ret !=0:
 			webiopi.debug("can't call rc_send")
-		#self.rc.send(self.socket_number,"on")
 		self.heater_status = 1
 	
 	def turn_off(self):
@@ -35,12 +32,7 @@ class Heater():
 				webiopi.debug("Canceling Timer")
 				self.heat_timer.cancel()
 				webiopi.debug("TIMER IS NOW:")
-		
 		self.heater_status = 0
-
-
-
-
 	def elapsed_time(self):
 		if self.heater_status == 0:
 			return 0

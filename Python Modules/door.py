@@ -16,13 +16,10 @@ class Doors():
 		GPIO.digitalWrite(self.servo_power, GPIO.HIGH)
 		webiopi.debug("mpika up_door")
 		webiopi.debug(self.servo_power)
-		Timer(2,GPIO.digitalWrite,[self.servo_power, GPIO.LOW]).start()
-		
+		Timer(2,GPIO.digitalWrite,[self.servo_power, GPIO.LOW]).start()	
 		if function == 1:
 			webiopi.debug("mpika sto open")
-
 			for angle in range(-90,90):
-
 				webiopi.debug(-angle)
 				GPIO.pwmWriteAngle(self.servo,-angle)
 			self.update_status(0) #initialize self.counter ,pass it as an argument
