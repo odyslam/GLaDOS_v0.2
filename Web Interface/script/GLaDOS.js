@@ -1,5 +1,7 @@
 var pc_status, l_light_status, r_light_status, o_light_status, heater_status, inside, el_time;
 
+//Change status vars to status_obj, it is passed via reference. When a value changes in a function
+//it will automatically change in the object, maybe cleaner
 $( document ).ready(function() {
     console.log( "ready!" );
     get_status();
@@ -30,8 +32,7 @@ function set_status(){
  function house(enter){
     var i = confirm ("Enter/Leave House Routine, please confirm")
     if (i == true){
-        call_macro("house",[enter]);
-        get_status();
+        call_macro("house",[enter],get_status);
     }    
  }
 function doors(door){
@@ -62,8 +63,8 @@ function pc() {
      }
  }
 function light(l_group_status,number){
-    statuslist = [l_light_status,r_light_status,o_light_status];
-    mode = 1 - statuslist[l_group_status]; /*if status = 1 (on) mode = 0 , turn off the light and vice versa */
+    var statuslist = [l_light_status,r_light_status,o_light_status];
+    var mode = 1 - statuslist[l_group_status]; /*if status = 1 (on) mode = 0 , turn off the light and vice versa */
     switch(l_group_status){
         case 0:
             l_light_status = mode;
@@ -105,10 +106,9 @@ function countdown_clock(seconds){
     });
 }
 function test_door(){
-    var intervalID = window.setInterval(pin_return, 500); 
-}
-function pin_return(){
-    digital_read(22,console.log)
+    var intervalID = window.setInterval(
+    function(){digital_read(22,console.log);}
+    , 500);
 }
 call_macro = function (macro, args, callback) {
 	if (args == undefined) {
@@ -123,7 +123,7 @@ call_macro = function (macro, args, callback) {
 digital_read = function (gpio, callback) {
 	if (callback != undefined) {
 		$.get('/GPIO/' + gpio + "/value", function(data) {
-			callback(data);  //use postman to see what it returns and replace the return w() with something simplers
+			callback(data);  
 		});
 	}
 	

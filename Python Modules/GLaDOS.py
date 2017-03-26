@@ -3,17 +3,19 @@ import webiopi
 import time
 from threading import Timer
 import sys
+import subprocess 
+import os
+import signal
+from datetime import datetime
+import json
+
+#import glados modules
 sys.path.insert(0, '/home/pi/glados_interface/python')
 import door
 import esp
 import infrared
 import pc_control
 import heater
-import subprocess 
-import os
-import signal
-from datetime import datetime
-import json
 
 #Pin Variables#
 GPIO = webiopi.GPIO
@@ -70,7 +72,7 @@ def destroy():
     GPIO.digitalWrite(SERVO_STATUS_PIN, GPIO.LOW)
     do.up_door(0) #lock up_door
     he.turn_off() #turn_off boiler
-    fb_bot.kill() #kill fb_bot
+    fb_bot.kill() #kill fb_bot, doesn't work atm
  #~~~~~~~~~~~~~~~~MACROS MACROS MACROS MACROS MACROS MACROS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 @webiopi.macro
 def house(enter):
@@ -103,7 +105,7 @@ def house(enter):
             lights(4, enter) #righ_light
             if hour >= 18:
                 time = "night"
-        Timer(60, pc.vnc_control, ["music", time, mood]).start()
+        Timer(90, pc.vnc_control, ["music", time, mood]).start()
     else: #enter = 0 <=> I am exiting the house
         glo_inside = 0
         webiopi.debug("leaving house")
@@ -130,7 +132,7 @@ def gday(): #Morning Routine
     Timer(15, inf.send, ["ADVANCE_ACOUSTIC", "input_computer", 2]).start()
     Timer(25, inf.send, ["ADVANCE_ACOUSTIC", "volume_up", 8]).start()
     Timer(40, pc.vnc_control, ["log_in", 0, 0]).start()
-    Timer(60, pc.vnc_control, ["music", "morning", "chill"]).start()
+    Timer(90, pc.vnc_control, ["music", "morning", "chill"]).start()
 @webiopi.macro
 def gnight(): #Night-Routine
     lights(1, 0) #office_light

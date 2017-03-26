@@ -2,12 +2,15 @@ from vncdotool import api
 import sys
 import random
 import json
+import os
 #from threading import Timer
 
 
 
 def music(time,mood): #uses spotify window
-    with open('/home/pi/glados_interface/python/music.json') as data_file:    
+    dir = os.path.join(sys.path[0], 'music.json')
+    print (dir)
+    with open(dir) as data_file:    
         music_all = json.load(data_file)
         music = []
     if time == "morning":
@@ -61,8 +64,6 @@ def turn_off(dummy1, dummy2):
     client.mouseMove(1860,960)
     client.mousePress(1)
     client.pause(1)
-
-
 if __name__ == '__main__':
     client = api.connect("192.168.1.20")
     option = {"log_in":log_in, "turn_off":turn_off, "music":music}
