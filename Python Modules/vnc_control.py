@@ -9,8 +9,7 @@ import os
 
 def music(time,mood): #uses spotify window
     dir = os.path.join(sys.path[0], 'music.json')
-    print (dir)
-    with open(dir) as data_file:    
+    with open(dir) as data_file:
         music_all = json.load(data_file)
         music = []
     if time == "morning":
@@ -21,10 +20,10 @@ def music(time,mood): #uses spotify window
         music.extend(music_all["romance"])
     elif mood == "chill":
         music.extend(music_all["chill"])
-    playlist = random.sample(music,1).pop()
+    playlist = random.sample(music, 1).pop()
     for i in range(len(music)):
         print music[i]
-    client.mouseMove(320,1050)
+    client.mouseMove(320, 1050)
     client.pause(3)
     client.mousePress(1)
     client.pause(2)

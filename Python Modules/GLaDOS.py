@@ -80,12 +80,12 @@ def house(enter):
     enter = int(enter)
     do.up_door(1)
     lights(1, enter) #office_lights
+    ap.set_status("digital", "tv-hifi", enter) 
     if enter == 1:
         glo_inside = 1
         mood = "chill"
-        time = 0
+        time = 0 
         do.down_door(1)
-        ap.set_status("digital", "tv-hifi", enter)
         if pc.status() == 0:
             ap.turn_on_pc()
         Timer(45, pc.vnc_control, ["log_in", 0, 0]).start()
@@ -111,7 +111,7 @@ def house(enter):
         webiopi.debug("leaving house")
         lights(3, enter) #left_light
         lights(4, enter) #righ_light
-        ap.set_status("digital", "tv-hifi", enter)
+        
 @webiopi.macro
 def open_door(door_number): #control appertment's/building's door
     door_number = int(door_number)
@@ -153,19 +153,16 @@ def heater(mode, time): #control boiler
 @webiopi.macro
 def lights(number, function): #function = 1/0 ==> on/off
     global socket1_status,socket2_status
+    sockets = [socket1_status,socket2_status]
     number = int(number)
     function = int(function)
-    if number == 1:
-        ret = subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN), str(function), str(1))], shell=True)
-        if ret !=0:
-            webiopi.debug("can't call rc_send")
-        socket1_status = function
-    elif number == 2:
-        ret = subprocess.call(["sudo python /home/pi/glados_interface/python/rc_send.py %s %s %s" %(str(TRANSMITTER_PIN), str(function), str(2))], shell=True)
-        if ret !=0:
-            webiopi.debug("can't call rc_send")
-        socket2_status = function
-        #rc2.send(function)
+    if number in [1,2]:
+        rc_string = "sudo python /home/pi/glados_interface/python/rc_send.py " + str(TRANSMITTER_PIN) + " " + str(function) + " " +  str(number)
+        answer = subprocess.Popen(rc_string,shell = True)
+        if number == 1:
+            socket1_status = function
+        elif number == 2:
+            socket2_status = function
     elif number == 3:
         ret=ap.set_status("digital","left_light",function)
         webiopi.debug("return value of function:%d is %s" %(function,str(ret)))
