@@ -90,7 +90,8 @@ def house(enter):
             ap.turn_on_pc()
         Timer(45, pc.vnc_control, ["log_in", 0, 0]).start()
         inf.send("ADVANCE_ACOUSTIC", "power", 1)
-        #next command after power doesn't work,reason uknown
+        # next command after power doesn't work,reason unknown
+        # send the next command twice
         inf.send("ADVANCE_ACOUSTIC", "input_computer", 1)
         Timer(15, inf.send, ["ADVANCE_ACOUSTIC", "input_computer", 1]).start()
         Timer(25, inf.send, ["ADVANCE_ACOUSTIC", "volume_up", 10]).start()
