@@ -1,0 +1,101 @@
+
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+#include <aREST.h>
+#define LISTEN_PORT      80
+#define PC_GPIO    5
+#define RELAY_1    14
+#define RELAY_2    4
+#define RELAY_3    12
+#define RELAY_4    13
+
+aREST rest = aREST();
+const char* ssid = "teleiose h traka";
+const char*  password = "defiler007";
+IPAddress ip(192, 168, 1, 30); 
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+
+WiFiServer server(LISTEN_PORT);
+
+int firmware_update(String dmy);
+int turnOnPc(String dmy);
+
+int OTA = 0;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Booting");
+  WiFi.begin(ssid, password);
+  WiFi.config(ip, gateway, subnet);
+  rest.set_id("1");
+  rest.set_name("glados_esp");
+  rest.function("pc_on", turnOnPc);
+  rest.function("update", firmware_update);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  server.begin();
+  Serial.println("WiFi connected");
+
+  pinMode(PC_GPIO, OUTPUT);
+  digitalWrite(PC_GPIO, HIGH);
+  pinMode(RELAY_1, OUTPUT);
+  digitalWrite(RELAY_1, HIGH);
+  pinMode(RELAY_2, OUTPUT);
+  digitalWrite(RELAY_2, HIGH);
+  pinMode(RELAY_3, OUTPUT);
+  digitalWrite(RELAY_3, HIGH);
+  pinMode(RELAY_4, OUTPUT);
+  digitalWrite(RELAY_4, HIGH);
+
+  Serial.println("outputs have been set");
+}
+
+
+
+
+void loop() {
+  if(OTA == 1){
+    Serial.println("ota update wait");
+    ArduinoOTA.handle();
+  }
+  else{
+  WiFiClient client = server.available();
+  if (!client) {
+    return;
+  }
+  while (!client.available()) {
+    delay(1);
+  }
+  rest.handle(client);
+  Serial.println("rest.handle");
+  }
+  
+}
+
+
+
+int turnOnPc(String dmy) {
+  digitalWrite(PC_GPIO, HIGH);
+  delay(500);
+  digitalWrite(PC_GPIO, LOW);
+  return 1;
+}
+
+//puts esp in OTA MODE standaby, it's freezes and waits for the OTA update to start.
+int firmware_update(String dmy) {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.println("\nreconnected to wifi");
+  ArduinoOTA.setHostname("glados_esp");
+  ArduinoOTA.begin();
+  Serial.println("Ready for OTA UPDATE");
+  OTA = 1; 
+ 
+}
+
+
